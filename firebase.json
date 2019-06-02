@@ -1,8 +1,8 @@
 {
-// "firestore": {
-//    "rules": "firestore.rules",
-//     "indexes": "firestore.indexes.json"
-//   },
+ "firestore": {
+    "rules": "firestore.rules",
+     "indexes": "firestore.indexes.json"
+   },
   "hosting": {
     "public": "dist/invoice-frontend2",
     "ignore": [
@@ -16,8 +16,8 @@
         "destination": "/index.html"
       }
     ]
-  } //,
-//  "storage": {
-//    "rules": "storage.rules"
-//  }
+  } ,
+  "storage": {
+    "rules": "storage.rules"
+  }
 }

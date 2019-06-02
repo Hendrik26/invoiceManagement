@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "invoicemanagement-fa34a"
+    "default": "invoicemanagement-fa34a",
+    "invoicemanagement": "invoicemanagement-fa34a"
   }
 }
