@@ -1,0 +1,297 @@
+<div class="invoice-detail">
+    <header>
+        <div class="adress-window">
+            <div class="postage-info">
+                <!--SednaSoft GbR, Biesnitzer Straße 8, 02826 Görlitz-->
+                {{setting.headerShortAddress}}
+            </div><!-- class="postage-info" -->
+            <select [(ngModel)]="invoiceSelectCustomer" (ngModelChange)="changeFilterCompany($event)">
+                <option selected [ngValue]="invoiceSelectCustomerDef1">
+                    {{invoice.customer.customerName}}
+                </option>
+                <option *ngFor="let opt of customers" [ngValue]="opt.getCustomerId()">
+                    {{opt.customerName}}
+                </option>
+            </select>
+            <br>
+            <textarea readonly="readonly" name="message" rows="6" cols="100" [(ngModel)]="customerAdress"
+                      placeholder="BspFirma&#x0a;Ansprechpartner&#x0a;Straße + HausNr.&#x0a;PLZ Ort&#x0a;Land">
+
+          </textarea>
+        </div><!-- class="adress-window" -->
+
+        <div class="checkboxfield">
+            <label><input type="checkbox" name="international" [checked]="invoice.invoiceKind.international"
+                          (change)="changeInternational()"> Auslandsrechnung</label>
+            <label><input type="checkbox" name="timeSpanBased" [checked]="invoice.invoiceKind.timeSpanBased"
+                          (change)="changeTimeSpanBased()"> Zeitraumbasiert</label>
+            <label><input type="checkbox" name="isSEPA" [checked]="invoice.invoiceKind.isSEPA"
+                          (change)="changeIsSEPA()"> SEPA-Lastschriftmandat</label>
+        </div>
+
+
+        <div>
+
+        </div>
+
+        <div class="contact-block">
+            <div class="logo">
+                <!--img src="assets/logo.png" alt="SednaSoft" title="SednaSoft"/-->
+                <img [src]="logoUrl" *ngIf="logoUrl && logoUrl.length > 0" alt="Logo" title="Logo"/>
+            </div><!-- class="logo" -->
+            <p *ngIf="setting.headerAddressLine01 && setting.headerAddressLine01.length > 0">
+                <strong>{{setting.headerAddressLine01}}</strong></p>
+            <p *ngIf="setting.headerAddressLine02 && setting.headerAddressLine02.length > 0">
+                {{setting.headerAddressLine02}}</p>
+            <p *ngIf="setting.headerAddressLine03 && setting.headerAddressLine03.length > 0">
+                {{setting.headerAddressLine03}}</p>
+            <p *ngIf="setting.headerAddressLine04 && setting.headerAddressLine04.length > 0">
+                {{setting.headerAddressLine04}}</p>
+            <p *ngIf="setting.headerAddressLine05 && setting.headerAddressLine05.length > 0">
+                {{setting.headerAddressLine05}}</p>
+        </div><!-- class="contact-block" -->
+
+    </header>
+
+
+    <main>
+        <section>
+            <div class="city-date">{{setting.headerLocation}},
+                <input type="date" name="inDate" [ngModel]="invoice.invoiceDate | date:'yyyy-MM-dd'"
+                       (ngModelChange)="invoiceDateChange($event)">
+            </div>
+
+            <h1 class="invoice-number" [ngStyle]="{'color': invoice.archived ? 'red' : 'black' }">Rechnung
+                <input class="invoice-number" [ngStyle]="{'color': invoice.archived ? 'red' : 'black' }"
+                       [ngModel]="invoice.invoiceNumber"
+                       (ngModelChange)="invoiceNumberChange($event)">
+            </h1>
+            <!-- p>Zeitraum: 2018-01-01 bis 2018-12-31 (12 Monate)</p>
+          <input class="timeSpan" class="inputLarge" [(ngModel)]="invoiceTimeSpan" -->
+            <div class="timespan" *ngIf="invoice.invoiceKind.timeSpanBased">
+                Zeitraum:
+                <input type="date" name="inStartDate" [ngModel]="invoice.timespanBegin | date:'yyyy-MM-dd'"
+                       (ngModelChange)="invoiceTimespanBeginChange($event)">
+                bis
+                <input type="date" name="inStartDate"
+                       [ngModel]="invoice.timespanEnd ? (invoice.timespanEnd | date:'yyyy-MM-dd') : ''"
+                       (ngModelChange)="invoiceTimespanEndChange($event)">
+                {{timespan()}}
+            </div>
+
+
+            <div class="mobile-style">
+                <!-- span *ngFor="let invoice of invoices" *ngIf="invoice.id === invoiceId" -->
+                <table>
+                    <!-- loop for all invoice - filter needed!!! -->
+                    <thead>
+                    <tr>
+                        <th>Leistungsnummer</th>
+                        <th>Leistungsbeschreibung</th>
+                        <th>Leistungsdatum</th>
+                        <th>Anzahl</th>
+                        <th>Stückpreis</th>
+                        <th>Gesamtpreis</th>
+                        <th>Ändern</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let item of invoice.items; let i = index">
+                        <!-- loop for all items -->
+                        <td>{{i + 1}}</td>
+                        <td *ngIf="changedItemNumber !== i">{{item.itemName}}</td>
+                        <td *ngIf="changedItemNumber === i"><input type="text" name="changedItem" size="70"
+                                                                   [(ngModel)]="changedItem.itemName"
+                                                                   placeholder="neue Leistungsbeschreibung"></td>
+                        <td *ngIf="changedItemNumber !== i">{{item.itemDate}}</td>
+                        <td *ngIf="changedItemNumber === i"><input type="text" name="changedItem" size="15"
+                                                                   [(ngModel)]="changedItem.itemDate"></td>
+                        <td *ngIf="changedItemNumber !== i">{{item.count}}</td>
+                        <td *ngIf="changedItemNumber === i"><input type="text" name="changedItem" size="7"
+                                                                   [(ngModel)] = "changedItem.count"
+                                                                   (ngModelChange)="calculateSums()">
+                        </td>
+                        <!-- td>{{item.partialCost | number:'1.2-2'}}{{invoiceCurrency}}</td -->
+                        <td *ngIf="changedItemNumber !== i">{{item.partialCostString(invoice.currency)}}</td>
+                        <td *ngIf="changedItemNumber === i"><input type="text" name="changedItem" size="7"
+                                                                   [(ngModel)]="changedItem.partialCost"
+                                                                   (ngModelChange) = "calculateSums()">
+                            <label>Stundenpreis</label>
+                            <input type="checkbox" [(ngModel)] = "changedItem.hourPayment">
+                            {{invoice.currency}}</td>
+                        <td>{{item.count * item.partialCost | number:'1.2-2'}}{{invoice.currency}}</td>
+                        <td>
+                            <button *ngIf="changedItemNumber !== i && !settingsService.readonly" (click)="editItemNumber(i)"
+                                             [disabled]="changedItemNumber != -1">
+                                bearbeiten
+                            </button>
+                            <button *ngIf="changedItemNumber !== i && !settingsService.readonly" (click)="deleteItemNumber(i)"
+                                    [disabled]="changedItemNumber != -1">
+                                löschen
+                            </button>
+                            <button *ngIf="changedItemNumber === i" (click)="notSaveItem()">
+                                zurück
+                            </button>
+                            <button *ngIf="changedItemNumber === i" (click)="saveItem()">
+                                speichern
+                            </button>
+                            <!-- a routerLink="/item-detail/{{invoiceId}}/{{item.getItemId()}}">Posten bearbeiten</a-->
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+
+                    <tr>
+                        <td colspan="4"></td>
+                        <td>Summe Netto</td>
+                        <td>{{invoice.wholeCost | number:'1.2-2'}}{{invoice.currency}}</td>
+                    </tr>
+                    <tr *ngIf="!invoice.invoiceKind.international">
+                        <td colspan="4"></td>
+                        <td>{{!invoice.invoiceKind.international ? (invoice.salesTaxPercentage | number:'1.0-1') + '%' : ''}} MwSt.</td>
+                        <td> {{!invoice.invoiceKind.international ? (salesTax | number:'1.2-2') : 'Brutto == Netto '}}{{invoice.currency}}</td>
+                        <td>
+                            <!--button type="button">Mehrwertsteuer ändern</button-->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"></td>
+                        <td>Rechnungsbetrag</td>
+                        <td> {{bruttoSum | number:'1.2-2'}}
+                            <select name="invoiceCurrency" [(ngModel)]="invoice.currency">
+                                <option value="€">€</option>
+                                <option value="USD">USD</option>
+                                <option value="GBP">GBP</option> <!-- Great -->
+                                <option value="CZK">CZK</option>
+                                <option value="PLN">PLN</option>
+                                <option value="CHF">CHF</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select name="invoiceState" [(ngModel)]="invoice.invoiceState">
+                                <option value="Entwurf">Entwurf</option>
+                                <option value="offen">offen</option>
+                                <option value="teilweise bezahlt">teilweise bezahlt</option>
+                                <option value="bezahlt">bezahlt</option>
+                            </select>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <button *ngIf="!settingsService.readonly" (click)="addNewItem()">Posten hinzufügen</button>
+            <button *ngIf="!settingsService.readonly" (click)="saveInvoice(false)">{{invoiceId ? 'speichern' : 'erstellen'}}</button>
+            <button *ngIf="invoiceId && !settingsService.readonly"(click)="saveInvoice(true)">archivieren</button>
+            <button (click)="backToInvoiceList()">zurück</button>
+            <button (click)="refreshSettings()">Einstellungen aktualisieren</button>
+            <button *ngIf="historyTest" (click)="receiveInvoiceHistoryById(invoiceId)">alte Versionen</button>
+            <select (change)="receiveInvoiceById(invoiceId,historyId)" *ngIf="historyDateList"
+                    [(ngModel)]="historyId" [ngModelOptions]="{standalone: true}" >
+                <option selected [ngValue]="undefined">
+                    aktuell
+                </option>
+                <option *ngFor="let opt of historyDateList" [ngValue]="opt.historyKey">
+                    {{opt.historyLabel}}
+                </option>
+            </select>
+
+            <p></p>
+            <div *ngIf="invoice.invoiceKind.international">
+                <dl>
+                    <dt>USt-IdNr.:</dt>
+                    <dd>DE243517710</dd>
+                    <dt>USt-IdNr. des Kunden:</dt>
+                    <dd>
+                        <input type="text" name="customerTaxNumber" size="27"
+                               [(ngModel)]="invoice.customer.customerSalesTaxNumber">
+                    </dd>
+                </dl>
+                <p>Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge)</p>
+            </div>
+            <p></p>
+            <div *ngIf="!invoice.invoiceKind.isSEPA">
+                <p>Bitte überweisen Sie den Rechnungsbetrag bis zum
+                    <input type="date" name="inDueDate" [ngModel]="invoice.invoiceDueDate | date:'yyyy-MM-dd'"
+                           (ngModelChange)="invoiceDueDateChange($event)">
+                    auf das unten angegebene Konto.</p>
+                <p> Als Verwendungszweck geben Sie bitte
+                    <input type="text" class="inputLarge" name="intendedUse" [(ngModel)]="invoice.invoiceIntendedUse">
+                    an.</p>
+            </div>
+            <div *ngIf="invoice.invoiceKind.isSEPA">
+                <p>Die Forderung von {{bruttoSum | number:'1.2-2'}}{{invoice.currency}} ziehen wir mit der SEPA
+                    Basislastschrift
+                    zum Mandat
+                    <input type="text" name="mandateIdentification" size="27"
+                           [(ngModel)]="invoice.customer.mandateIdentification">
+                    zu der Gläubigeridentifikationsnummer {{setting.creditorIdentificationNumber}}
+                    von Ihrem Konto IBAN
+                    <input type="text" name="customerIBAN" size="27" [(ngModel)]="invoice.customer.customerIBAN">
+                    bei der Bank BIC
+                    <input type="text" name="customerBIC" size="27" [(ngModel)]="invoice.customer.customerBIC">
+                    zum Fälligkeitsdatum {{invoice.invoiceDueDate | date:'yyyy-MM-dd'}} ein. Wir bitten Sie,
+                    für Kontodeckung zu sorgen.</p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="address">
+            <p><strong>Adresse</strong></p>
+            <p *ngIf="setting.footerAddressLine01 && setting.footerAddressLine01.length > 0">
+                {{setting.footerAddressLine01}}</p>
+            <p *ngIf="setting.footerAddressLine02 && setting.footerAddressLine02.length > 0">
+                {{setting.footerAddressLine02}}</p>
+            <p *ngIf="setting.footerAddressLine03 && setting.footerAddressLine03.length > 0">
+                {{setting.footerAddressLine03}}</p>
+            <p *ngIf="setting.footerAddressLine04 && setting.footerAddressLine04.length > 0">
+                {{setting.footerAddressLine04}}</p>
+            <p *ngIf="setting.footerAddressLine05 && setting.footerAddressLine05.length > 0">
+                {{setting.footerAddressLine05}}</p>
+            <p *ngIf="invoice.invoiceKind.international">{{setting.footerAddressCountry}}</p>
+        </div>
+        <div class="contact">
+            <p><strong>Kontakt</strong></p>
+            <dl>
+                <dt *ngIf="setting.footerContactLine01 && setting.footerContactLine01.length > 0">
+                    {{setting.footerContactLine01}}</dt>
+                <dd *ngIf="setting.footerContactLine01 && setting.footerContactLine01.length > 0">
+                    {{setting.footerContactLine11}}</dd>
+                <dt *ngIf="setting.footerContactLine02 && setting.footerContactLine02.length > 0">
+                    {{setting.footerContactLine02}}</dt>
+                <dd *ngIf="setting.footerContactLine02 && setting.footerContactLine02.length > 0">
+                    {{setting.footerContactLine12}}</dd>
+                <dt *ngIf="setting.footerContactLine03 && setting.footerContactLine03.length > 0">
+                    {{setting.footerContactLine03}}</dt>
+                <dd *ngIf="setting.footerContactLine03 && setting.footerContactLine03.length > 0">
+                    {{setting.footerContactLine13}}</dd>
+                <dt *ngIf="setting.footerContactLine04 && setting.footerContactLine04.length > 0">
+                    {{setting.footerContactLine04}}</dt>
+                <dd *ngIf="setting.footerContactLine04 && setting.footerContactLine04.length > 0">
+                    {{setting.footerContactLine14}}</dd>
+                <dt *ngIf="setting.footerContactLine05 && setting.footerContactLine05.length > 0">
+                    {{setting.footerContactLine05}}</dt>
+                <dd *ngIf="setting.footerContactLine05 && setting.footerContactLine05.length > 0">
+                    {{setting.footerContactLine15}}</dd>
+
+            </dl>
+        </div>
+        <div class="bankconnection">
+            <p><strong>Bankverbindung</strong></p>
+            <p *ngIf="setting.footerBankConnection01 && setting.footerBankConnection01.length > 0">
+                {{setting.footerBankConnection01}}</p>
+            <p *ngIf="setting.footerBankConnection02 && setting.footerBankConnection02.length > 0">
+                {{setting.footerBankConnection02}}</p>
+            <p *ngIf="setting.footerBankConnection03 && setting.footerBankConnection03.length > 0">
+                {{setting.footerBankConnection03}}</p>
+            <p *ngIf="setting.footerBankConnection04 && setting.footerBankConnection04.length > 0">
+                {{setting.footerBankConnection04}}</p>
+            <p *ngIf="setting.footerBankConnection05 && setting.footerBankConnection05.length > 0">
+                {{setting.footerBankConnection05}}</p>
+        </div>
+        <div class="tax-number">
+            <p><strong>USt-IdNr.</strong></p>
+            <p *ngIf="setting.footerTaxIdentification && setting.footerTaxIdentification.length > 0">
+                {{setting.footerTaxIdentification}}</p>
+        </div>
+    </footer>
+</div>

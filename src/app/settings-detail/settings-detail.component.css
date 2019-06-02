@@ -1,0 +1,60 @@
+.item-detail {
+    margin: 50px;
+}
+
+
+h1 {
+    background-color: #00afc4;
+    font-weight: bold;
+    color: #fff;
+}
+
+label {
+    display: block;
+    padding: 4px;
+}
+
+label:nth-child(even) {
+    background-color: rgba(0,175,196,.15);
+}
+
+label span, p span {
+    display: inline-block;
+    width: 15%;
+}
+
+input[type=text] {
+    width: 84%;
+}
+
+input[type=text1] {
+    width: 20%;
+}
+input[type=text2] {
+    width: 63%;
+}
+
+input[type=checkbox] {
+    margin-left: 10%;
+}
+
+input[name=itemDate], input[type=number] {
+    width: 6%;
+}
+
+p {
+    background-color: rgba(0,175,196,.15);
+    padding: 4px;
+    margin: 0 0 20px 0;
+    border-bottom: 1px solid #000;
+    font-weight: bold;
+}
+
+
+.logo {
+    margin-bottom: 20px;
+}
+
+.logo img {
+    width: 300px;
+}

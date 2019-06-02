@@ -1,0 +1,105 @@
+<div class="item-detail">
+    <h1>Einstellungen</h1>
+    <!-- p>erstellt am: {{creationTime | date:'yyyy-MM-dd'}}</p -->
+    <form>
+        <h3>Kuradresse</h3>
+        <label><span>Kurzadresse</span><input type="text" name="shortAddress"
+                                              [(ngModel)]="settingsService.setting.headerShortAddress"></label>
+        <h3>Adresse im Rechnungskopf</h3>
+        <label><span>Adresszeile 1</span><input type="text" name="headerAddressLine01"
+                                                [(ngModel)]="settingsService.setting.headerAddressLine01"></label>
+        <label><span>Adresszeile 2</span><input type="text" name="headerAddressLine02"
+                                                [(ngModel)]="settingsService.setting.headerAddressLine02"></label>
+        <label><span>Adresszeile 3</span><input type="text" name="headerAddressLine03"
+                                                [(ngModel)]="settingsService.setting.headerAddressLine03"></label>
+        <label><span>Adresszeile 4</span><input type="text" name="headerAddressLine04"
+                                                [(ngModel)]="settingsService.setting.headerAddressLine04"></label>
+        <label><span>Adresszeile 5</span><input type="text" name="headerAddressLine05"
+                                                [(ngModel)]="settingsService.setting.headerAddressLine05"></label>
+        <h3>Ortsbezeichnung vor Datumsfeld</h3>
+        <label><span>Ortsbezeichnung</span><input type="text" name="headerLocation"
+                                                  [(ngModel)]="settingsService.setting.headerLocation"></label>
+        <h3>Adresse im Rechnungsfuß</h3>
+        <label><span>Adresszeile 1</span><input type="text" name="footerAddressLine01"
+                                                [(ngModel)]="settingsService.setting.footerAddressLine01"></label>
+        <label><span>Adresszeile 2</span><input type="text" name="footerAddressLine02"
+                                                [(ngModel)]="settingsService.setting.footerAddressLine02"></label>
+        <label><span>Adresszeile 3</span><input type="text" name="footerAddressLine03"
+                                                [(ngModel)]="settingsService.setting.footerAddressLine03"></label>
+        <label><span>Adresszeile 4</span><input type="text" name="footerAddressLine04"
+                                                [(ngModel)]="settingsService.setting.footerAddressLine04"></label>
+        <label><span>Adresszeile 5</span><input type="text" name="footerAddressLine05"
+                                                [(ngModel)]="settingsService.setting.footerAddressLine05"></label>
+        <label><span>Land</span><input type="text" name="footerAddressCountry"
+                                       [(ngModel)]="settingsService.setting.footerAddressCountry"></label>
+        <h3>Kontakt im Rechnungsfuß</h3>
+        <label><span>Kontaktzeile 1</span><input type="text1" name="footerContactLine01"
+                                                 [(ngModel)]="settingsService.setting.footerContactLine01">
+            <input type="text2" name="footerContactLine11"
+                   [(ngModel)]="settingsService.setting.footerContactLine11"></label>
+        <label><span>Kontaktzeile 2</span><input type="text1" name="footerContactLine02"
+                                                 [(ngModel)]="settingsService.setting.footerContactLine02">
+            <input type="text2" name="footerContactLine12"
+                   [(ngModel)]="settingsService.setting.footerContactLine12"></label>
+        <label><span>Kontaktzeile 3</span><input type="text1" name="footerContactLine03"
+                                                 [(ngModel)]="settingsService.setting.footerContactLine03">
+            <input type="text2" name="footerContactLine13"
+                   [(ngModel)]="settingsService.setting.footerContactLine13"></label>
+        <label><span>Kontaktzeile 4</span><input type="text1" name="footerContactLine04"
+                                                 [(ngModel)]="settingsService.setting.footerContactLine04">
+            <input type="text2" name="footerContactLine14"
+                   [(ngModel)]="settingsService.setting.footerContactLine14"></label>
+        <label><span>Kontaktzeile 5</span><input type="text1" name="footerContactLine05"
+                                                 [(ngModel)]="settingsService.setting.footerContactLine05">
+            <input type="text2" name="footerContactLine15"
+                   [(ngModel)]="settingsService.setting.footerContactLine15"></label>
+        <h3>Bankverbindung im Rechnungsfuß</h3>
+        <label><span>Bankverbindung 1</span><input type="text" name="footerBankConnection01"
+                                                   [(ngModel)]="settingsService.setting.footerBankConnection01"></label>
+        <label><span>Bankverbindung 2</span><input type="text" name="footerBankConnection02"
+                                                   [(ngModel)]="settingsService.setting.footerBankConnection02"></label>
+        <label><span>Bankverbindung 3</span><input type="text" name="footerBankConnection03"
+                                                   [(ngModel)]="settingsService.setting.footerBankConnection03"></label>
+        <label><span>Bankverbindung 4</span><input type="text" name="footerBankConnection04"
+                                                   [(ngModel)]="settingsService.setting.footerBankConnection04"></label>
+        <label><span>Bankverbindung 5</span><input type="text" name="footerBankConnection05"
+                                                   [(ngModel)]="settingsService.setting.footerBankConnection05"></label>
+        <h3>Weitere Angaben im Rechnungsfuß</h3>
+        <label><span>Steueridentifikationsnr.</span><input type="text" name="footerTaxIdentification"
+                                                           [(ngModel)]="settingsService.setting.footerTaxIdentification"></label>
+        <label><span>Gläubigeridentifikationsnr.</span><input type="text" name="footerCreditorIdentification"
+                                                              [(ngModel)]="settingsService.setting.creditorIdentificationNumber"></label>
+        <h3>Login Nachricht</h3>
+        <label><span>Berechtigungsstufe 0</span><input type="text" name="loginTxt0"
+                                                       [(ngModel)]="settingsService.setting.loginTxt0"></label>
+        <label><span>Berechtigungsstufe 1</span><input type="text" name="loginTxt1"
+                                                       [(ngModel)]="settingsService.setting.loginTxt1"></label>
+        <label><span>Berechtigungsstufe 2</span><input type="text" name="loginTxt2"
+                                                       [(ngModel)]="settingsService.setting.loginTxt2"></label>
+        <label><span>Berechtigungsstufe 3</span><input type="text" name="loginTxt3"
+                                                       [(ngModel)]="settingsService.setting.loginTxt3"></label>
+        <h3>neues Logo hochladen</h3>
+        <div class="logo">
+            <label><span>neue Logo Datei hochladen</span>
+                <input type="file" (change)="uploadLogo($event)" accept=".png,.jpg">
+                <img [src]="settingsService.logoUrl"
+                     *ngIf="settingsService.logoUrl && settingsService.logoUrl.length > 0" alt="Logo" title="Logo"/>
+            </label>
+        </div>
+        <hr>
+        <button (click)="saveSetting()" [disabled]="!enableSaveButton">speichern</button>
+        <a routerLink="/login">Home</a>
+        alte Versionen
+        <select (change)="receiveSettingById(settingId)" *ngIf="settingList"
+                [(ngModel)]="settingId" [ngModelOptions]="{standalone: true}">
+            <option selected [ngValue]="undefined">
+                aktuell
+            </option>
+            <option *ngFor="let opt of settingList" [ngValue]="opt.key">
+                {{opt.creationTime}}
+            </option>
+        </select>
+
+
+    </form>
+</div>

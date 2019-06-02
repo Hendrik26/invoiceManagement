@@ -1,0 +1,59 @@
+<div class="customer-list">
+
+    <h1> Kundenübersicht </h1>
+
+
+    <label><input (change)="receiveCustomers()" name="archive" type="radio" value="notArchive"
+                  [(ngModel)]="showArchive" checked="checked">nur nicht archivierte &nbsp;&nbsp;</label>
+    <label><input (change)="receiveCustomers()" name="archive" type="radio" value="showArchive"
+                  [(ngModel)]="showArchive">nur archivierte&nbsp;&nbsp;</label>
+    <label><input (change)="receiveCustomers()" name="archive" type="radio" value="all"
+                  [(ngModel)]="showArchive">alle&nbsp;&nbsp;</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+    <a routerLink="/login">Home</a>
+    <button (click)="newCustomereBtn()">Neuer Kunde</button>
+    <a routerLink="/invoice-list">Rechnungsübersicht</a>
+    <br><br>
+
+    <div>
+        <table style="display: block; max-height: 80vh; overflow-y: scroll">
+            <thead>
+            <tr>
+                <th>Kundennummer</th>
+                <th>Kundenname</th>
+                <th>Land</th>
+                <th>Postleitzahl</th>
+                <th>Stadt</th>
+                <th>Adresse 1</th>
+                <th>Adresse 2</th>
+                <th>Adresse 3</th>
+                <th>Umsatzsteuernummer</th>
+                <th>erstellt am</th>
+                <th>letztes update am</th>
+                <!-- th>Archiviert???</th -->
+                <th>Ändern</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let customer of customers">
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.customerNumber}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.customerName}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.country}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.postalCode}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.city}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.addressLine1}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.addressLine2}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.addressLine3}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.customerSalesTaxNumber}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.creationTime | date:'yyyy-MM-dd'}}</td>
+                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.lastUpdateTime | date:'yyyy-MM-dd'}}</td>
+                <!-- td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.archived}}</td -->
+                <td>
+                    <a routerLink="/customer-detail/{{customer.getCustomerId()}}/false"
+                       [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">bearbeiten</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

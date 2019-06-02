@@ -1,0 +1,81 @@
+/* You can add global styles to this file, and also import other style files */
+* {
+    font-family: Corbel, "Liberation Sans", sans-serif;
+    font-size: 16px;
+    line-height: 120%;
+}
+
+h1 {
+    font-size: 32px;
+}
+
+a, button {
+    font-size: 13.33px;
+}
+
+.mobile-style {
+    overflow-x: auto;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #00afc4;
+    font-weight: bold;
+    color: #fff;
+}
+
+tbody tr:nth-child(even) {
+    background-color: rgba(0,175,196,.15);
+}
+
+td {
+    color: #000;
+}
+
+a {
+    background-color: #eee;
+    padding: 5px 10px;
+    margin-right: 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #000;
+    cursor: pointer;
+}
+
+a:hover {
+    background-color: #cfd8dc;
+}
+
+button {
+    background-color: #eee;
+    border: none;
+    padding: 5px 10px;
+    margin-right: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #cfd8dc;
+}
+
+button:disabled {
+    background-color: #eee;
+    color: #ccc;
+    cursor: auto;
+}
+
+dt {
+    display: inline-block;
+    float: left;
+}

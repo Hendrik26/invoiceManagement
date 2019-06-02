@@ -1,0 +1,36 @@
+<div class="item-detail">
+    <h1 [ngStyle]="{'color': customer.archived ? 'red' : 'black' }">Kundendetailansicht</h1>
+    <!-- p>erstellt am: {{creationTime | date:'yyyy-MM-dd'}}</p -->
+    <form>
+        <label><span>Kundennummer</span><input type="text" name="customerNumber" [(ngModel)]="customer.customerNumber"></label>
+        <label><span>Firmenname des Kunden</span><input type="text" name="customerName"
+                                                        [(ngModel)]="customer.customerName"></label>
+        <label><span>Adresszeile 1</span><input type="text" name="addressLine1" [(ngModel)]="customer.addressLine1"></label>
+        <label><span>Adresszeile 2</span><input type="text" name="addressLine2" [(ngModel)]="customer.addressLine2"></label>
+        <label><span>Adresszeile 3</span><input type="text" name="addressLine3" [(ngModel)]="customer.addressLine3"></label>
+        <label><span>Land</span><input type="text" name="country" [(ngModel)]="customer.country"></label>
+        <label><span>Postleitzahl</span><input type="text" name="postalCode" [(ngModel)]="customer.postalCode"></label>
+        <label><span>Stadt</span><input type="text" name="city" [(ngModel)]="customer.city"></label>
+        <label><span>Umsatzsteuernummer</span><input type="text" name="•	customerSalesTaxNumber"
+                                                     [(ngModel)]="customer.customerSalesTaxNumber"></label>
+        <label><span>IBAN</span><input type="text" name="IBAN" [(ngModel)]="customer.customerIBAN"></label>
+        <label><span>Mandatsreferenz</span><input type="text" name="mandateIdentification"
+                                                  [(ngModel)]="customer.mandateIdentification"></label>
+        <br>
+        <button (click)="saveCustomer(false)">{{newCustomer ? 'erstellen' : 'speichern'}}</button>
+        <button *ngIf="!newCustomer" (click)="saveCustomer(true)">archivieren</button>
+        <button (click)="backToCustomerList()">{{newCustomer ? 'verwerfen' : 'zurück'}}</button>
+        <button *ngIf="historyTest" (click)="receiveCustomerHistoryById(customerId)">alte Versionen</button>
+
+        <select (change)="receiveFbCustomerById(customerId,historyId)" *ngIf="historyDateList"
+                [(ngModel)]="historyId" [ngModelOptions]="{standalone: true}" >
+            <option selected [ngValue]="undefined">
+                aktuell
+            </option>
+            <option *ngFor="let opt of historyDateList" [ngValue]="opt.historyKey">
+                {{opt.historyLabel}}
+            </option>
+        </select>
+    </form>
+</div>
+

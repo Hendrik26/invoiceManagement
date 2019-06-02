@@ -1,0 +1,107 @@
+<h1>Rechnungsübersicht</h1>
+<div class="flex-container">
+    <div>
+        Datumsbereich<br>
+        <select [(ngModel)]="invoiceFilterDateOption" (ngModelChange)="changeFilterDateOption()">
+            <option value="0">Kein</option>
+            <option value="1">Rechnungsdatum</option>
+            <option value="2">Fälligkeitsdatum</option>
+        </select>
+    </div>
+    <div>
+        Datum von <br><input type="date" name="fStartDate" [ngModel]="filterStartDate | date:'yyyy-MM-dd'"
+                             (ngModelChange)="changeFilterStartDate($event)">
+    </div>
+    <div>Datum bis<br><input type="date" name="fEndDate" [ngModel]="filterEndDate | date:'yyyy-MM-dd'"
+                             (ngModelChange)="changeFilterEndDate($event)">
+    </div>
+    <div>Status<br>
+        <select [(ngModel)]="invoiceFilterState" (ngModelChange)="changeFilterState($event)">
+            <option value="Kein">Kein</option>
+            <option value="Entwurf">Entwurf</option>
+            <option value="offen">offen</option>
+            <option value="teilweise bezahlt">teilweise bezahlt</option>
+            <option value="bezahlt">bezahlt</option>
+        </select>
+    </div>
+    <div>Emfpänger<br>
+        <select [(ngModel)]="invoiceFilterCompany" (ngModelChange)="changeFilterCompany($event)">
+            <option selected [ngValue]="undefined">
+                --alle--
+            </option>
+            <option *ngFor="let opt of customers" [ngValue]="opt.getCustomerId()">
+                {{opt.customerName}}
+            </option>
+        </select>
+
+    </div>
+    <div>Archiv<br>
+        <select [(ngModel)]="invoiceFilterArchive" (ngModelChange)="changeFilterArchive($event)">
+            <option value="all">alle</option>
+            <option value="notArchive">nur nicht archivierte</option>
+            <option value="showArchive">nur archivierte</option>
+        </select>
+    </div>
+
+</div>
+<table style="width:100%">
+    <thead>
+    <tr>
+        <!--th>RechnungsId</th-->
+        <th>
+            Fälligkeitsdatum
+            <button name="sort" id="sortStartDueDate" (click)="sortStartDueDateClick()">
+                Sortierung {{sortStartDueDate.getSortingOrderName()}}
+            </button>
+        </th>
+        <th>
+            Rechnungsdatum
+            <button name="sort" id="sortStartDate" (click)="sortStartDateClick()">
+                Sortierung {{sortStartDate.getSortingOrderName()}}
+            </button>
+
+        </th>
+        <th>Rechnungsnr</th>
+        <th>
+            Empfänger
+            <button name="sort" id="sortCompanyName" (click)="sortCompanyNameClick()">
+                Sortierung {{sortCompanyName.getSortingOrderName()}}
+            </button>
+
+        </th>
+        <th>Status (Entwurf, bezahlt, ...)</th>
+        <th>Gesamtpreis</th>
+        <!--th>Anzahl der Mahnungen</th-->
+        <!--th>Rechnungzeitraum</th-->
+        <th>Ändern</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let invoice of invoices">
+        <!--td>< {{invoice.getID()}} > place for invoiceId</td-->
+        <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.invoiceDueDate | date:'yyyy-MM-dd'}}</td>
+        <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.invoiceDate | date:'yyyy-MM-dd'}}</td>
+        <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.invoiceNumber}}</td>
+        <!--td>{{invoice.customerData.customerName}}</td-->
+        <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.getCustomerName()}}</td>
+        <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.invoiceState}}</td>
+        <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.wholeCost}}{{invoice.currency}}</td>
+        <!--td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.countReminders}}</td-->
+        <!--td>{{invoice.timeSpan}}</td-->
+        <td>
+            <!-- button type="button">Rechnung bearbeiten</button -->
+
+            <a routerLink="/invoice-detail/{{invoice.getID()}}/false">Rechnung bearbeiten</a>
+            <!-- link to the details of a dedicated invoice -->
+
+        </td>
+    </tr>
+    <!-- ///////////////////////////// -->
+    </tbody>
+</table>
+
+<a routerLink="/login">Home</a>
+<a *ngIf="!settingsService.readonly" routerLink="/invoice-detail/newInvoice/true" >Neuer Rechnungsentwurf</a>
+
+
+<a routerLink="/customer-list">Kunden bearbeiten</a>

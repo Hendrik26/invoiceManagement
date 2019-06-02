@@ -1,0 +1,30 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Match any document in the 'customers' collection and its subcollections
+        match /customers/{document=**} {
+          allow read: if get(/databases/$(database)/documents/userprofiles/$(request.auth.uid)).data.authorityLevel >= 2
+          allow write: if get(/databases/$(database)/documents/userprofiles/$(request.auth.uid)).data.authorityLevel >= 2
+        }
+
+    // Match any document in the 'invoices' collection and its subcollections
+        match /invoices/{document=**} {
+          allow read: if get(/databases/$(database)/documents/userprofiles/$(request.auth.uid)).data.authorityLevel >= 1
+          allow write: if get(/databases/$(database)/documents/userprofiles/$(request.auth.uid)).data.authorityLevel >= 2
+        }
+
+    // Match any document in the 'settings' collection 
+        match /settings/{setting} {
+          allow read: if request.auth.uid != null;
+          allow write: if get(/databases/$(database)/documents/userprofiles/$(request.auth.uid)).data.authorityLevel >= 3
+        }
+
+    // Match any document in the 'userprofiles' collection        
+        match /userprofiles/{userprofile} {
+          allow read: if request.auth.uid == userprofile;
+          allow read: if get(/databases/$(database)/documents/userprofiles/$(request.auth.uid)).data.authorityLevel >= 3
+          allow write: if get(/databases/$(database)/documents/userprofiles/$(request.auth.uid)).data.authorityLevel >= 3
+        }
+
+  }
+}

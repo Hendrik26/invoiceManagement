@@ -1,0 +1,37 @@
+<h1>Benutzerübersicht</h1>
+<br>
+<div>
+    <table style="display: block; max-height: 80vh; overflow-y: scroll">
+        <thead>
+        <tr>
+            <th>Nr.</th>
+            <th>Email</th>
+            <th>erstellt</th>
+            <!--th>Id</th-->
+            <th>Berechtigung</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let user of users; let i = index">
+            <td>{{i}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.created | date:'dd.MM.yyyy hh:mm'}}</td>
+            <!--td>{{user.id}}</td-->
+            <td>
+                <!-- [(ngModel)] doesn't work correctly with "input type='radio'" -
+                the use of (click) and [checked] is a workaround-->
+                <input type="radio" value="0" name="{{'radio' + i}}" [checked]="user.authorityLevel== 0"
+                       (click)="changeAuthorityLevel(i,0)"> keine&nbsp;&nbsp;
+                <input type="radio" value="1" name="{{'radio' + i}}" [checked]="user.authorityLevel== 1"
+                       (click)="changeAuthorityLevel(i,1)"> lesen&nbsp;&nbsp;
+                <input type="radio" value="2" name="{{'radio' + i}}" [checked]="user.authorityLevel== 2"
+                       (click)="changeAuthorityLevel(i,2)"> bearbeiten&nbsp;&nbsp;
+                <input type="radio" value="3" name="{{'radio' + i}}" [checked]="user.authorityLevel== 3"
+                       (click)="changeAuthorityLevel(i,3)"> administrieren
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<hr>
+<a routerLink="/login">Home</a>
