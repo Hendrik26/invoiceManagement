@@ -13,11 +13,21 @@ const historyCollection = 'history'; // Spelling-errors removed here
 exports.createProfile = functions.auth.user()
     .onCreate((userRecord, context) => {
         const date = new Date();
-        return admin.firestore().collection(userProfileCollection).doc(userRecord.uid).set({
-            email: userRecord.email,
-            authorityLevel: 0,
-            created: date
-        });
+        let  authorityLevel = 0;
+        admin.firestore().collection(userProfileCollection).get()
+            .then(dataSnapshot => {
+                // first user becomes an admin
+                if (dataSnapshot.size === 0) {
+                    authorityLevel = 3;
+                }
+                return admin.firestore().collection(userProfileCollection).doc(userRecord.uid).set({
+                    email: userRecord.email,
+                    authorityLevel: authorityLevel,
+                    created: date
+                });
+            })
+            .catch(err => console.log(err) );
+
     });
 
 // Removes the associated profile record when a user is deleted

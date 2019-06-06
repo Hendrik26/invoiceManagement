@@ -30,7 +30,6 @@
     <strong *ngIf="settingsService.loginUser.authorityLevel === 1">{{settingsService.setting.loginTxt1}}</strong>
     <p *ngIf="settingsService.loginUser.authorityLevel === 2">{{settingsService.setting.loginTxt2}}</p>
     <p *ngIf="settingsService.loginUser.authorityLevel === 3">{{settingsService.setting.loginTxt3}}</p>
-    <h6 *ngIf="settingsService.readonly">Sie haben nur Leseberechtigung</h6>
     <a routerLink="/invoice-list" *ngIf="settingsService.loginUser.authorityLevel >= 1">Rechnungen bearbeiten</a>&nbsp;&nbsp;
     <a routerLink="/customer-list" *ngIf="!settingsService.readonly">Kunden bearbeiten</a>&nbsp;&nbsp;
     <a routerLink="/user-list" *ngIf="settingsService.loginUser.authorityLevel >= 3">Benutzer bearbeiten</a>&nbsp;&nbsp;
@@ -48,4 +47,5 @@
     <h6 *ngIf="settingsService.loginUser.id && settingsService.passReset1">
         Das Rücksetzen des Kennwortes wurde eingeleitet, bitte prüfen Sie Ihr Postfach
     </h6>
+
 </div>&nbsp;

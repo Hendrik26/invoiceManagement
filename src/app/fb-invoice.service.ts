@@ -70,7 +70,11 @@ export class FbInvoiceService {
         const userProfile$: Observable<any> = user$.pipe(switchMap(value => {
             return this.db.collection(this.dbUserPath).doc(value.user.uid).valueChanges();
         }));
-        return combineLatest(user$, userProfile$);
+        if (userProfile$) {
+            return combineLatest(user$, userProfile$);
+        } else {
+            return user$;
+        }
     }
 
     logout() {
