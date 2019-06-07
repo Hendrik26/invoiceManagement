@@ -5,7 +5,7 @@
    },
   "hosting": {
     "predeploy": [
-      "ng build"
+      "ng build --prod"
     ],
     "public": "dist/invoice-frontend2",
     "ignore": [

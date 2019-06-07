@@ -68,7 +68,7 @@ export class InvoiceDetailComponent implements OnInit {
         this.receiveCustomers();
     }
 
-    receiveCustomers(): void {
+    public receiveCustomers(): void {
         this.fbInvoiceService.getCustomersList('notArchive')
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
@@ -109,6 +109,32 @@ export class InvoiceDetailComponent implements OnInit {
         if (this.setting.logoId && this.setting.logoId.length > 0) {
             this.getDownloadUrl(this.setting.logoId);
         }
+    }
+
+    public changeInternational(): void {
+        this.invoice.invoiceKind.international = !this.invoice.invoiceKind.international;
+        console.log('invoice-detail.component.ts.changeInternational()');
+        this.calculateSums();
+    }
+
+    public invoiceDateChange(methEvent: string) {
+        this.invoice.invoiceDate = new Date(methEvent);
+        this.invoice.invoiceDueDate = new Date(this.invoice.invoiceDate.getFullYear(), this.invoice.invoiceDate.getMonth(),
+            this.invoice.invoiceDate.getDate() + 14, 12);
+    }
+
+    public invoiceNumberChange(e: string) {
+        this.invoice.invoiceNumber = e;
+        this.invoice.invoiceIntendedUse = 'die Rechnungsnummer ' + this.invoice.invoiceNumber;
+    }
+
+    public backToInvoiceList(): void {
+        // TODO: back to InvoiceList without saving
+        if (this.creatingInvoice || this.creatingInvoiceBtn) {
+            this.creatingInvoice = false;
+            this.creatingInvoiceBtn = false;
+        }
+        this.router.navigateByUrl('/invoice-list');
     }
 
     private editItemNumber(row: number): void {
@@ -215,12 +241,6 @@ export class InvoiceDetailComponent implements OnInit {
         this.bruttoSum = this.salesTax + this.invoice.wholeCost;
     }
 
-    private changeInternational(): void {
-        this.invoice.invoiceKind.international = !this.invoice.invoiceKind.international;
-        console.log('invoice-detail.component.ts.changeInternational()');
-        this.calculateSums();
-    }
-
     private hasReceivedInvoiceId(): // can NOT be deleted
         boolean {
         if (this.route.snapshot.paramMap.has('invoiceId')) {
@@ -240,32 +260,12 @@ export class InvoiceDetailComponent implements OnInit {
         this.invoice.invoiceDate = new Date(methEvent);
     }
 
-    private invoiceDateChange(methEvent: string) {
-        this.invoice.invoiceDate = new Date(methEvent);
-        this.invoice.invoiceDueDate = new Date(this.invoice.invoiceDate.getFullYear(), this.invoice.invoiceDate.getMonth(),
-            this.invoice.invoiceDate.getDate() + 14, 12);
-    }
-
     private invoiceTimespanBeginChange(methEvent: string) {
         this.invoice.timespanBegin = new Date(methEvent);
     }
 
     private invoiceTimespanEndChange(methEvent: string) {
         this.invoice.timespanEnd = new Date(methEvent);
-    }
-
-    private invoiceNumberChange(e: string) {
-        this.invoice.invoiceNumber = e;
-        this.invoice.invoiceIntendedUse = 'die Rechnungsnummer ' + this.invoice.invoiceNumber;
-    }
-
-    private backToInvoiceList(): void {
-        // TODO: back to InvoiceList without saving
-        if (this.creatingInvoice || this.creatingInvoiceBtn) {
-            this.creatingInvoice = false;
-            this.creatingInvoiceBtn = false;
-        }
-        this.router.navigateByUrl('/invoice-list');
     }
 
     private timespan(): string {
