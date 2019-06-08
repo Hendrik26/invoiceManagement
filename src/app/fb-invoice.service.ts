@@ -4,17 +4,14 @@ import {Injectable} from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
 import {Customer} from './customer';
 import {CustomerType} from './customer-type';
-// import {Setting} from './setting';
 import {Invoice} from './invoice';
 import {InvoiceType} from './invoice-type';
-// import {map} from 'rxjs/operators';
-import {Observable, from, combineLatest} from 'rxjs';
+import {combineLatest, from, Observable} from 'rxjs';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {AngularFireStorage} from '@angular/fire//storage';
 import * as firebase from 'firebase';
-import {switchMap, map} from 'rxjs/operators';
+import {map, switchMap} from 'rxjs/operators';
 import {SettingType} from './setting-type';
-import {Setting} from './setting';
 
 
 @Injectable({
@@ -51,7 +48,7 @@ export class FbInvoiceService {
 
     uploadLogo(event): Observable<any> {
         const ref = this.afStorage.ref(FbInvoiceService.getHistoryKey());
-        return  from(ref.put(event.target.files[0]));
+        return from(ref.put(event.target.files[0]));
     }
 
     getDownloadUrl(id: string): Observable<any> {
@@ -73,7 +70,11 @@ export class FbInvoiceService {
         const userProfile$: Observable<any> = user$.pipe(switchMap(value => {
             return this.db.collection(this.dbUserPath).doc(value.user.uid).valueChanges();
         }));
-        return combineLatest(user$, userProfile$);
+        if (userProfile$) {
+            return combineLatest(user$, userProfile$);
+        } else {
+            return user$;
+        }
     }
 
     logout() {
@@ -125,8 +126,8 @@ export class FbInvoiceService {
     getSettingList(): Observable<any> {
         return this.db.collection(this.dbSettingPath).snapshotChanges()
             .pipe(map(changes =>
-                changes.map(c => ({key: c.payload.doc.id, creationTime: FbInvoiceService.historyKeyToLabel(c.payload.doc.id)} )
-            )));
+                changes.map(c => ({key: c.payload.doc.id, creationTime: FbInvoiceService.historyKeyToLabel(c.payload.doc.id)})
+                )));
     }
 
     // receives one specific setting document

@@ -4,6 +4,9 @@
      "indexes": "firestore.indexes.json"
    },
   "hosting": {
+    "predeploy": [
+      "ng build"
+    ],
     "public": "dist/invoice-frontend2",
     "ignore": [
       "firebase.json",
@@ -19,5 +22,8 @@
   } ,
   "storage": {
     "rules": "storage.rules"
+  },
+  "functions": {
+    "source": "functions"
   }
 }

@@ -80,7 +80,7 @@ export class Setting implements SettingType {
 
     public static normalizeSetting(inSetting: any): Setting {
         const setting = new Setting();
-        setting.creationTime = inSetting.creationTime ? inSetting.creationTime : new Date();
+        setting.creationTime = inSetting.creationTime ? inSetting.creationTime.toDate() : new Date();
         setting.creditorIdentificationNumber = inSetting.logoId ? inSetting.creditorIdentificationNumber : '';
         setting.footerAddressCountry = inSetting.footerAddressCountry ? inSetting.footerAddressCountry : '';
         setting.footerAddressLine01 = inSetting.footerAddressLine01 ? inSetting.footerAddressLine01 : '';
