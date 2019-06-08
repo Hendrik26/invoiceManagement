@@ -200,11 +200,13 @@ export class FbInvoiceService {
     // creates a new customer document
     createCustomer(data: CustomerType): Observable<any> {
         return from(this.db.collection(this.dbCustomerPath).add(data));
+        // from(...) converts Promise to Observable
     }
 
     // updates an existing customer document
     updateCustomer(id: string, data: CustomerType): Observable<any> {
         return from(this.db.doc(`${this.dbCustomerPath}/${id}`).set(data));
+        // from(...) converts Promise to Observable
     }
 
     // receives one specific invoice document
