@@ -9,7 +9,6 @@ import {FbInvoiceService} from '../fb-invoice.service';
     styleUrls: ['./customer-list.component.css']
 })
 export class CustomerListComponent implements OnInit {
-    ////////
 
     customerParentId: string;
     customers: Customer[];
