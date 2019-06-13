@@ -8,6 +8,7 @@ import {FbInvoiceService} from '../fb-invoice.service';
 import {SettingsService} from '../settings.service';
 import {Customer} from '../customer';
 import {Setting} from '../setting';
+import {Subscription} from 'rxjs';
 
 @Component({
     selector: 'app-invoice-detail',
@@ -37,10 +38,12 @@ export class InvoiceDetailComponent implements OnInit {
     logoUrl: string;
     salesTax: number;
     setting: Setting;
+    timeoutCounter: string;
     private editNewItem: boolean;
     private items: Item[];
     private oldItem: Item;
     private receivedInvoiceIdError: boolean;
+    private subscription: Subscription;
 
     constructor(
         private router: Router,
@@ -61,18 +64,25 @@ export class InvoiceDetailComponent implements OnInit {
         console.log(`\r\n\r\nInvoiceDetailComponent.ngOnInit() step 002,\r\n creatingInvoice ===${this.creatingInvoice}! \r\n\r\n`);
         if (!this.receivedInvoiceIdError && this.invoiceId) {
             this.receiveInvoiceById(this.invoiceId, null);
+            this.lockInvoice();
         } else {
             this.getDownloadUrl(this.setting.logoId);
         }
         this.calculateSums();
         this.receiveCustomers();
-        this.getTimeout(600);
+        this.getTimeout(this.settingsService.setting.timeoutForEdit);
     }
 
     public getTimeout(sec: number): void {
-        this.fbInvoiceService.getTimeout(sec).subscribe(
-            time => {
-                console.log(time);
+        this.subscription = this.fbInvoiceService.getTimeout(sec).subscribe(
+            count => {
+                const countSec = 100 + count % 60;
+                const countMin = Math.floor(count / 60);
+                this.timeoutCounter = countMin.toString() + ':' + countSec.toString().slice(1, 3);
+                if (count <= 0) {
+                    this.backToInvoiceList();
+                    // alert('Rechnungseditor wurde wegen Zeitüberschreitung geschlossen');
+                }
             });
     }
 
@@ -137,11 +147,12 @@ export class InvoiceDetailComponent implements OnInit {
     }
 
     public backToInvoiceList(): void {
-        // TODO: back to InvoiceList without saving
         if (this.creatingInvoice || this.creatingInvoiceBtn) {
             this.creatingInvoice = false;
             this.creatingInvoiceBtn = false;
         }
+        this.subscription.unsubscribe();
+        this.unlockInvoice();
         this.router.navigateByUrl('/invoice-list');
     }
 
@@ -185,8 +196,8 @@ export class InvoiceDetailComponent implements OnInit {
         this.changedItem = this.invoice.items[this.changedItemNumber];
     }
 
-    private receiveInvoiceById(methId: string, historyId: string): void {
-        this.fbInvoiceService.getInvoiceById(methId, historyId, this.settingsService.settingId).subscribe(c => {
+    private receiveInvoiceById(id: string, historyId: string): void {
+        this.fbInvoiceService.getInvoiceById(id, historyId, this.settingsService.settingId).subscribe(c => {
             this.invoice = Invoice.normalizeInvoice(c[0]);
             if (c[1]) {
                 this.setting = Setting.normalizeSetting(c[1]);
@@ -199,10 +210,36 @@ export class InvoiceDetailComponent implements OnInit {
             this.getDownloadUrl(this.setting.logoId);
             this.calculateSums();
             this.calculateAddress();
-            this.fbInvoiceService.testInvoiceHistoryById(methId).subscribe(invoiceTest => {
+            this.fbInvoiceService.testInvoiceHistoryById(id).subscribe(invoiceTest => {
                 this.historyTest = invoiceTest[1];
             });
         });
+    }
+
+    private lockInvoice(): void {
+        if (!this.invoiceId) {
+            return;
+        }
+        this.fbInvoiceService.lockInvoice(this.invoiceId, this.settingsService.loginUser.email, new Date()).subscribe(
+            () => {
+            }
+            , () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during locking a invoice');
+            }
+        );
+    }
+
+    private unlockInvoice(): void {
+        if (!this.invoiceId) {
+            return;
+        }
+        this.fbInvoiceService.lockInvoice(this.invoiceId, null, null).subscribe(
+            () => {
+            }
+            , () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during unlocking a invoice');
+            }
+        );
     }
 
     private getDownloadUrl(id: string): void {

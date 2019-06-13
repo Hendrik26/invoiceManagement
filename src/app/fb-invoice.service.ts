@@ -6,14 +6,12 @@ import {Customer} from './customer';
 import {CustomerType} from './customer-type';
 import {Invoice} from './invoice';
 import {InvoiceType} from './invoice-type';
-import {combineLatest, from, Observable} from 'rxjs';
+import {combineLatest, from, Observable, timer} from 'rxjs';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {AngularFireStorage} from '@angular/fire//storage';
 import * as firebase from 'firebase';
 import {map, switchMap} from 'rxjs/operators';
 import {SettingType} from './setting-type';
-import {interval, timer } from 'rxjs';
-
 
 
 @Injectable({
@@ -30,7 +28,7 @@ export class FbInvoiceService {
     constructor(private firebaseAuth: AngularFireAuth,
                 private db: AngularFirestore,
                 private afStorage: AngularFireStorage) {
-        this.clock$ = interval(10000).pipe(map(tick => new Date()));
+        this.clock$ = timer(0, 10000).pipe(map(tick => new Date()));
     }
 
     private static historyKeyToLabel(key: string): string {
@@ -368,7 +366,7 @@ export class FbInvoiceService {
                     .where('archived', '==', filterArchive)),
             null
         ];
-        return invoiceRefs[refIndex].snapshotChanges()
+        const invoiceList$ = invoiceRefs[refIndex].snapshotChanges()
             .pipe(map(changes =>
                 changes.map(c => ({
                     key: c.payload.doc.id,
@@ -379,6 +377,7 @@ export class FbInvoiceService {
                             0) : 0)
                 }))
             ));
+        return invoiceList$;
     }
 
     // receives te first two documents of the history - necessary to test the existence of the invoice history
@@ -421,6 +420,11 @@ export class FbInvoiceService {
         batch.set(invoiceHistoryRef, data);
         console.log(`\r\n\r\nDB-Update with BatchWrite invoiceHistoryRef!!! \r\n\r\n`);
         return from(batch.commit());
+    }
+
+    // locks or unlocks an invoice
+    lockInvoice(id: string, lockedBy: string, lockedSince: Date): Observable<any> {
+        return from(this.db.doc(`${this.dbInvoicePath}/${id}`).update({lockedBy: lockedBy, lockedSince: lockedSince}));
     }
 
 }

@@ -181,7 +181,7 @@
             <button *ngIf="!settingsService.readonly" (click)="addNewItem()">Posten hinzufügen</button>
             <button *ngIf="!settingsService.readonly" (click)="saveInvoice(false)">{{invoiceId ? 'speichern' : 'erstellen'}}</button>
             <button *ngIf="invoiceId && !settingsService.readonly"(click)="saveInvoice(true)">archivieren</button>
-            <button (click)="backToInvoiceList()">zurück</button>
+            <button (click)="backToInvoiceList()">zurück in {{timeoutCounter}}</button>
             <button (click)="refreshSettings()">Einstellungen aktualisieren</button>
             <button *ngIf="historyTest" (click)="receiveInvoiceHistoryById(invoiceId)">alte Versionen</button>
             <select (change)="receiveInvoiceById(invoiceId,historyId)" *ngIf="historyDateList"

@@ -54,15 +54,11 @@ export class InvoiceListComponent implements OnInit {
     }
 
     ngOnInit() {
-        // this.testBool();
         this.sortStartDueDate = new ThreeStateButton('DueDate');
         this.sortStartDate = new ThreeStateButton('Date');
         this.sortCompanyName = new ThreeStateButton('CompanyName');
         this.receiveInvoices();
         this.receiveCustomers();
-        // this.customers = this.calculateCompanySelectOptions(this.invoices);
-        // this.companySelectOptions2 = this.calculateCompanySelectOptions2(this.invoices);
-        // this.initialSaveInvoicesToDB02();
     }
 
 
@@ -76,6 +72,7 @@ export class InvoiceListComponent implements OnInit {
         this.fbInvoiceService.getInvoiceList(refIndex, filterStartDate, filterEndDate, this.invoiceFilterState,
             invoiceFilterCompany, invoiceFilterArchive)
             .subscribe(invoices => {
+                console.log('INVOICES: ', invoices)
                 this.invoices = invoices.map(invoice => Invoice.normalizeInvoice(invoice));
                 this.sortInvoice();
             });

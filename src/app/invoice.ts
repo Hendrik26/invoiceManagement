@@ -21,6 +21,8 @@ export class Invoice implements InvoiceType {
         invoiceState: 'Entwurf', // <th>Status (Entwurf, bezahlt, ...)</th>
         itemTypes: [],
         newCreatedInvoice: true,
+        lockedBy: null,
+        lockedSince:  null,
         salesTaxPercentage: 19,
         settingId: null,
         timeSpan: 'bspTimeSpan', // <th>Rechnungzeitraum</th>
@@ -42,6 +44,8 @@ export class Invoice implements InvoiceType {
     invoiceState: string; // <th>Status (Entwurf, bezahlt, ...)</th>
     items: Item[];
     itemTypes: ItemType[];
+    lockedBy: string;
+    lockedSince:  Date;
     newCreatedInvoice: boolean;
     salesTaxPercentage: number;
     settingId: string;
@@ -72,6 +76,8 @@ export class Invoice implements InvoiceType {
         this.items = [];
         this.itemTypes = [];
         this.newCreatedInvoice = data.newCreatedInvoice;
+        this.lockedBy = data.lockedBy;
+        this.lockedSince = data.lockedSince;
         this.salesTaxPercentage = data.salesTaxPercentage;
         this.settingId = data.settingId;
         this.timeSpan = `${data.timespanBegin} bis ${data.timespanEnd}`; // <th>Rechnungzeitraum</th>
@@ -111,6 +117,8 @@ export class Invoice implements InvoiceType {
             invoiceState: inputInvoice.invoiceState ? inputInvoice.invoiceState : 'Entwurf', // <th>Status (Entwurf, bezahlt, ...)</th>
             itemTypes: [],
             newCreatedInvoice: false,
+            lockedBy: inputInvoice.lockedBy ? inputInvoice.lockedBy : null,
+            lockedSince:  inputInvoice.lockedSince && inputInvoice.lockedSince.toDate() ? inputInvoice.lockedSince.toDate() :null,
             salesTaxPercentage: (typeof inputInvoice.salesTaxPercentage === 'number') ? inputInvoice.salesTaxPercentage : 19,
             settingId: inputInvoice.settingId,
             timeSpan: 'bspTimeSpan', // <th>Rechnungzeitraum</th>
@@ -218,6 +226,8 @@ export class Invoice implements InvoiceType {
             invoiceState: this.invoiceState, // <th>Status (Entwurf, bezahlt, ...)</th>
             itemTypes: Invoice.createItemTypeArray(this.items),
             newCreatedInvoice: this.newCreatedInvoice,
+            lockedBy: null,
+            lockedSince: null,
             salesTaxPercentage: this.salesTaxPercentage,
             settingId: this.settingId,
             timeSpan: this.timeSpan, // <th>Rechnungzeitraum</th>

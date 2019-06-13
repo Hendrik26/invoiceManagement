@@ -15,6 +15,8 @@ export interface InvoiceType {
     invoiceNumber: string; // <th>RechnungsNr</th>
     invoiceState: string; // <th>Status (Entwurf, bezahlt, ...)</th>
     itemTypes: ItemType[];
+    lockedBy: string;
+    lockedSince:  Date;
     newCreatedInvoice: boolean;
     salesTaxPercentage: number;
     settingId: string;

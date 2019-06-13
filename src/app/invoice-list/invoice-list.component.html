@@ -82,7 +82,6 @@
         <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.invoiceDueDate | date:'yyyy-MM-dd'}}</td>
         <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.invoiceDate | date:'yyyy-MM-dd'}}</td>
         <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.invoiceNumber}}</td>
-        <!--td>{{invoice.customerData.customerName}}</td-->
         <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.getCustomerName()}}</td>
         <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.invoiceState}}</td>
         <td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.wholeCost}}{{invoice.currency}}</td>
@@ -91,9 +90,8 @@
         <td>
             <!-- button type="button">Rechnung bearbeiten</button -->
 
-            <a routerLink="/invoice-detail/{{invoice.getID()}}/false">Rechnung bearbeiten</a>
-            <!-- link to the details of a dedicated invoice -->
-
+            <a *ngIf="!invoice.lockedBy" routerLink="/invoice-detail/{{invoice.getID()}}/false">Rechnung bearbeiten</a>
+            <span *ngIf="invoice.lockedBy">wird bearbeitet von {{invoice.lockedBy}} seit {{invoice.lockedSince  | date:'hh:mm'}}</span>
         </td>
     </tr>
     <!-- ///////////////////////////// -->
