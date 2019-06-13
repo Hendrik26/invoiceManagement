@@ -35,4 +35,5 @@ export interface SettingType {
     loginTxt2: string;
     loginTxt3: string;
     logoId: string;
+    timeoutForEdit: number;
 }

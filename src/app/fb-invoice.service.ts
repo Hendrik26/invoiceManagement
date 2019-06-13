@@ -12,6 +12,8 @@ import {AngularFireStorage} from '@angular/fire//storage';
 import * as firebase from 'firebase';
 import {map, switchMap} from 'rxjs/operators';
 import {SettingType} from './setting-type';
+import {interval, timer } from 'rxjs';
+
 
 
 @Injectable({
@@ -23,10 +25,12 @@ export class FbInvoiceService {
     private dbInvoicePath = '/invoices';
     private dbUserPath = '/userprofiles';
     private dbSettingPath = '/settings';
+    private clock$: Observable<Date>;
 
     constructor(private firebaseAuth: AngularFireAuth,
                 private db: AngularFirestore,
                 private afStorage: AngularFireStorage) {
+        this.clock$ = interval(0,10000).pipe(map(tick => new Date()));
     }
 
     private static historyKeyToLabel(key: string): string {
@@ -44,6 +48,11 @@ export class FbInvoiceService {
             + ('0' + date.getSeconds().toString()).slice(-2) + '-'
             + ('00' + date.getMilliseconds().toString()).slice(-3);
         return key;
+    }
+
+    getTimeout(sec: number): Observable<any> {
+        const date = new Date();
+        return this.clock$.pipe(map(tick => sec - Math.floor((tick.getTime() - date.getTime()) / 1000)));
     }
 
     uploadLogo(event): Observable<any> {

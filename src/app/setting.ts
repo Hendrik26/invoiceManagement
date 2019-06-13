@@ -38,6 +38,7 @@ export class Setting implements SettingType {
     loginTxt2: string;
     loginTxt3: string;
     logoId: string;
+    timeoutForEdit: number;
 
     constructor() {
         this.creationTime = new Date();
@@ -76,6 +77,7 @@ export class Setting implements SettingType {
         this.loginTxt2 = '';
         this.loginTxt3 = '';
         this.logoId = '';
+        this.timeoutForEdit = 600;
     }
 
     public static normalizeSetting(inSetting: any): Setting {
@@ -116,6 +118,7 @@ export class Setting implements SettingType {
         setting.loginTxt2 = inSetting.loginTxt2 ? inSetting.loginTxt2 : '';
         setting.loginTxt3 = inSetting.loginTxt3 ? inSetting.loginTxt3 : '';
         setting.logoId = inSetting.logoId ? inSetting.logoId : '';
+        setting.timeoutForEdit = (typeof inSetting.timeoutForEdit === 'number') ? inSetting.timeoutForEdit : 6000;
         return setting;
     }
 
@@ -156,7 +159,8 @@ export class Setting implements SettingType {
             loginTxt1: this.loginTxt1,
             loginTxt2: this.loginTxt2,
             loginTxt3: this.loginTxt3,
-            logoId: this.logoId
+            logoId: this.logoId,
+            timeoutForEdit: this.timeoutForEdit
         };
     }
 

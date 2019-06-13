@@ -66,6 +66,14 @@ export class InvoiceDetailComponent implements OnInit {
         }
         this.calculateSums();
         this.receiveCustomers();
+        this.getTimeout(600);
+    }
+
+    public getTimeout(sec: number): void {
+        this.fbInvoiceService.getTimeout(sec).subscribe(
+            time => {
+                console.log(time);
+            });
     }
 
     public receiveCustomers(): void {
