@@ -18,7 +18,6 @@ import {SettingType} from './setting-type';
     providedIn: 'root'
 })
 export class FbInvoiceService {
-    // Branch dev2019-06-13locking
 
     private dbCustomerPath = '/customers';
     private dbInvoicePath = '/invoices';
