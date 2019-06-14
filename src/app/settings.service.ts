@@ -16,6 +16,7 @@ export class SettingsService {
   passReset2 = false;
   readonly: boolean;
   logoUrl: string;
+  timeoutAlert: string
 
   constructor( ) {
     this.loginUser = new LoginUser(null, null, null, null, null);

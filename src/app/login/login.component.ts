@@ -19,6 +19,7 @@ export class LoginComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.settingsService.timeoutAlert = null;
     }
 
     private signin(type: number) {

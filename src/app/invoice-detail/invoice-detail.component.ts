@@ -71,6 +71,7 @@ export class InvoiceDetailComponent implements OnInit {
         this.calculateSums();
         this.receiveCustomers();
         this.getTimeout(this.settingsService.setting.timeoutForEdit);
+        this.settingsService.timeoutAlert = null;
     }
 
     public getTimeout(sec: number): void {
@@ -81,7 +82,7 @@ export class InvoiceDetailComponent implements OnInit {
                 this.timeoutCounter = countMin.toString() + ':' + countSec.toString().slice(1, 3);
                 if (count <= 0) {
                     this.backToInvoiceList();
-                    // alert('Rechnungseditor wurde wegen Zeitüberschreitung geschlossen');
+                    this.settingsService.timeoutAlert = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
                 }
             });
     }
@@ -161,7 +162,7 @@ export class InvoiceDetailComponent implements OnInit {
         this.oldItem = new Item(this.invoice, this.invoice.items[row]);
         this.changedItem = this.invoice.items[row];
         this.editNewItem = false;
-        console.log(`this.changedItemNumber === ${row}`);
+        this.lockInvoice();
     }
 
     private deleteItemNumber(row: number): void {
@@ -185,6 +186,7 @@ export class InvoiceDetailComponent implements OnInit {
         this.changedItemNumber = -1;
         this.editNewItem = false;
         this.calculateSums();
+        this.lockInvoice();
     }
 
     private addNewItem(): void {
@@ -194,6 +196,7 @@ export class InvoiceDetailComponent implements OnInit {
         this.editNewItem = true;
         this.oldItem = new Item(this.invoice, this.invoice.items[this.changedItemNumber]);
         this.changedItem = this.invoice.items[this.changedItemNumber];
+        this.lockInvoice();
     }
 
     private receiveInvoiceById(id: string, historyId: string): void {
@@ -270,6 +273,7 @@ export class InvoiceDetailComponent implements OnInit {
             }
         );
         this.router.navigateByUrl('/invoice-list');
+        this.lockInvoice();
     }
 
     private calculateAddress(): void {

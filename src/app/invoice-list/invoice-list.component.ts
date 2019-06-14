@@ -49,9 +49,7 @@ export class InvoiceListComponent implements OnInit {
     // endregion
 
     constructor(private fbInvoiceService: FbInvoiceService,
-                public settingsService: SettingsService,
-                private router: Router) {
-    }
+                public settingsService: SettingsService) { }
 
     ngOnInit() {
         this.sortStartDueDate = new ThreeStateButton('DueDate');
@@ -81,7 +79,9 @@ export class InvoiceListComponent implements OnInit {
 
     receiveCustomers(): void {
         this.fbInvoiceService.getCustomersList('notArchive')
-            .subscribe(data => {this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x))) ; });
+            .subscribe(data => {
+                this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
+            });
     }
 
     sortStartDueDateClick(): void {
