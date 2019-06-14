@@ -70,9 +70,8 @@ export class InvoiceListComponent implements OnInit {
         const invoiceFilterCompany = this.invoiceFilterCompany ? this.invoiceFilterCompany : '';
         const invoiceFilterArchive: boolean = (this.invoiceFilterArchive == 'showArchive');
         this.fbInvoiceService.getInvoiceList(refIndex, filterStartDate, filterEndDate, this.invoiceFilterState,
-            invoiceFilterCompany, invoiceFilterArchive)
+            invoiceFilterCompany, invoiceFilterArchive, this.settingsService.loginUser.email, this.settingsService.setting.timeoutForEdit)
             .subscribe(invoices => {
-                console.log('INVOICES: ', invoices)
                 this.invoices = invoices.map(invoice => Invoice.normalizeInvoice(invoice));
                 this.sortInvoice();
             });

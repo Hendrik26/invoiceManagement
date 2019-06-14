@@ -237,7 +237,7 @@ export class FbInvoiceService {
 
     // receives the invoice query with several filter options
     getInvoiceList(refIndex: number, filterStartDate: Date, filterEndDate: Date, filterState: string,
-                   filterCustomer: string, filterArchive: boolean): Observable<any> {
+                   filterCustomer: string, filterArchive: boolean, userEmail: string, timeoutForEdit: number): Observable<any> {
         // let invoiceRef: AngularFirestoreCollection<Invoice> = null;
         const invoiceRefs: AngularFirestoreCollection<Invoice>[] = [
             // 0
@@ -377,9 +377,23 @@ export class FbInvoiceService {
                             0) : 0)
                 }))
             ));
-        return invoiceList$;
+        return combineLatest(invoiceList$, this.clock$)
+             .pipe(map (combined => {
+                 // let x = combined[0];
+                 combined[0].forEach(element => {
+                     const lockTimestamp: any = element.lockedSince;
+                     if (lockTimestamp && lockTimestamp.toDate()) {
+                         const lockDate = lockTimestamp.toDate().getTime();
+                         const testDate = combined[1].getTime();
+                         if (((testDate - lockDate) / 1000 > timeoutForEdit + 30) || (element.lockedBy === userEmail)) {
+                             element.lockedBy = null;
+                             element.lockedSince = null;
+                         }
+                     }
+                     return element; });
+                 return combined[0];
+             }));
     }
-
     // receives te first two documents of the history - necessary to test the existence of the invoice history
     testInvoiceHistoryById(invoiceId: string): Observable<any> {
         // create the database reference
