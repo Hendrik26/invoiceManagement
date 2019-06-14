@@ -43,7 +43,8 @@ export class InvoiceDetailComponent implements OnInit {
     private items: Item[];
     private oldItem: Item;
     private receivedInvoiceIdError: boolean;
-    private subscription: Subscription;
+    private timeoutSubscription: Subscription;
+    private invoiceLocked = false;
 
     constructor(
         private router: Router,
@@ -63,6 +64,7 @@ export class InvoiceDetailComponent implements OnInit {
         this.receivedInvoiceIdError = !this.hasReceivedInvoiceId();
         console.log(`\r\n\r\nInvoiceDetailComponent.ngOnInit() step 002,\r\n creatingInvoice ===${this.creatingInvoice}! \r\n\r\n`);
         if (!this.receivedInvoiceIdError && this.invoiceId) {
+            this.invoiceLocked = false;
             this.receiveInvoiceById(this.invoiceId, null);
             this.lockInvoice();
         } else {
@@ -70,12 +72,12 @@ export class InvoiceDetailComponent implements OnInit {
         }
         this.calculateSums();
         this.receiveCustomers();
-        this.getTimeout(this.settingsService.setting.timeoutForEdit);
+        // this.getTimeout(this.settingsService.setting.timeoutForEdit);
         this.settingsService.timeoutAlert = null;
     }
 
     public getTimeout(sec: number): void {
-        this.subscription = this.fbInvoiceService.getTimeout(sec).subscribe(
+        this.timeoutSubscription = this.fbInvoiceService.getTimeout(sec).subscribe(
             count => {
                 const countSec = 100 + count % 60;
                 const countMin = Math.floor(count / 60);
@@ -152,7 +154,9 @@ export class InvoiceDetailComponent implements OnInit {
             this.creatingInvoice = false;
             this.creatingInvoiceBtn = false;
         }
-        this.subscription.unsubscribe();
+        if (this.timeoutSubscription) {
+            this.timeoutSubscription.unsubscribe();
+        }
         this.unlockInvoice();
         this.router.navigateByUrl('/invoice-list');
     }
@@ -162,6 +166,7 @@ export class InvoiceDetailComponent implements OnInit {
         this.oldItem = new Item(this.invoice, this.invoice.items[row]);
         this.changedItem = this.invoice.items[row];
         this.editNewItem = false;
+        this.invoiceLocked = true;
         this.lockInvoice();
     }
 
@@ -176,6 +181,8 @@ export class InvoiceDetailComponent implements OnInit {
         this.invoice.items[this.changedItemNumber] = Item.normalizeItem(this.invoice, this.invoice.items[this.changedItemNumber]);
         this.changedItemNumber = -1;
         this.calculateSums();
+        this.invoiceLocked = true;
+        this.lockInvoice();
     }
 
     private notSaveItem(): void {
@@ -186,6 +193,7 @@ export class InvoiceDetailComponent implements OnInit {
         this.changedItemNumber = -1;
         this.editNewItem = false;
         this.calculateSums();
+        this.invoiceLocked = true;
         this.lockInvoice();
     }
 
@@ -196,26 +204,29 @@ export class InvoiceDetailComponent implements OnInit {
         this.editNewItem = true;
         this.oldItem = new Item(this.invoice, this.invoice.items[this.changedItemNumber]);
         this.changedItem = this.invoice.items[this.changedItemNumber];
+        this.invoiceLocked = true;
         this.lockInvoice();
     }
 
     private receiveInvoiceById(id: string, historyId: string): void {
-        this.fbInvoiceService.getInvoiceById(id, historyId, this.settingsService.settingId).subscribe(c => {
-            this.invoice = Invoice.normalizeInvoice(c[0]);
-            if (c[1]) {
-                this.setting = Setting.normalizeSetting(c[1]);
-            } else {
-                this.setting = this.settingsService.setting;
+        this.timeoutSubscription = this.fbInvoiceService.getInvoiceById(id, historyId, this.settingsService.settingId).subscribe(c => {
+            if (!this.invoiceLocked) {
+                this.invoice = Invoice.normalizeInvoice(c[0]);
+                if (c[1]) {
+                    this.setting = Setting.normalizeSetting(c[1]);
+                } else {
+                    this.setting = this.settingsService.setting;
+                }
+                if (!this.invoice.settingId) {
+                    this.invoice.settingId = this.settingsService.settingId;
+                }
+                this.getDownloadUrl(this.setting.logoId);
+                this.calculateSums();
+                this.calculateAddress();
+                this.fbInvoiceService.testInvoiceHistoryById(id).subscribe(invoiceTest => {
+                    this.historyTest = invoiceTest[1];
+                });
             }
-            if (!this.invoice.settingId) {
-                this.invoice.settingId = this.settingsService.settingId;
-            }
-            this.getDownloadUrl(this.setting.logoId);
-            this.calculateSums();
-            this.calculateAddress();
-            this.fbInvoiceService.testInvoiceHistoryById(id).subscribe(invoiceTest => {
-                this.historyTest = invoiceTest[1];
-            });
         });
     }
 
@@ -223,6 +234,7 @@ export class InvoiceDetailComponent implements OnInit {
         if (!this.invoiceId) {
             return;
         }
+        this.getTimeout(this.settingsService.setting.timeoutForEdit);
         this.fbInvoiceService.lockInvoice(this.invoiceId, this.settingsService.loginUser.email, new Date()).subscribe(
             () => {
             }
@@ -264,6 +276,9 @@ export class InvoiceDetailComponent implements OnInit {
 
     private saveInvoice(archive: boolean = false): void {
         console.log('invoice-detail.component.ts: method saveInvoice');
+        if (this.timeoutSubscription) {
+            this.timeoutSubscription.unsubscribe();
+        }
         this.calculateSums();
         this.fbInvoiceService.updateInvoice(this.invoiceId, this.invoice.exportInvoiceToAny(archive)).subscribe(
             () => {

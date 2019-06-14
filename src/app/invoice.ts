@@ -10,6 +10,7 @@ export class Invoice implements InvoiceType {
     private static emptyData: InvoiceType = {
         archived: false,
         countReminders: 0, // <th>Anzahl der Mahnungen</th>
+        creationTime:  new Date(),
         currency: '€',
         customerId: 'emptyCustomerId',
         customerData: Customer.getEmptyCustomer(),
@@ -21,6 +22,7 @@ export class Invoice implements InvoiceType {
         invoiceState: 'Entwurf', // <th>Status (Entwurf, bezahlt, ...)</th>
         itemTypes: [],
         newCreatedInvoice: true,
+        lastUpdateTime: new Date(),
         lockedBy: null,
         lockedSince:  null,
         salesTaxPercentage: 19,
@@ -33,17 +35,19 @@ export class Invoice implements InvoiceType {
 
     archived: boolean;
     countReminders: number; // <th>Anzahl der Mahnungen</th>
+    creationTime: Date;
     currency = '€';
     customer: Customer;
     customerId: string;
     invoiceDate: Date; // <th>Rechnungsdatum</th>
     invoiceDueDate: Date; // Faelligkeitsdatum
-    invoiceNumber: string; // <th>RechnungsNr</th>
     invoiceIntendedUse: string; // Verwendungszweck
     invoiceKind: InvoiceKind;
+    invoiceNumber: string; // <th>RechnungsNr</th>
     invoiceState: string; // <th>Status (Entwurf, bezahlt, ...)</th>
     items: Item[];
     itemTypes: ItemType[];
+    lastUpdateTime: Date;
     lockedBy: string;
     lockedSince:  Date;
     newCreatedInvoice: boolean;
@@ -65,6 +69,7 @@ export class Invoice implements InvoiceType {
         // other properties
         this.archived = data.archived;
         this.countReminders = data.countReminders; // <th>Anzahl der Mahnungen</th>
+        this.creationTime = data.creationTime;
         this.currency = data.currency;
         this.customer = new Customer(data.customerId, data.customerData);
         this.invoiceDate = data.invoiceDate; // <th>Rechnungsdatum</th>
@@ -75,9 +80,10 @@ export class Invoice implements InvoiceType {
         this.invoiceState = data.invoiceState; // <th>Status (Entwurf, bezahlt, ...)</th>
         this.items = [];
         this.itemTypes = [];
-        this.newCreatedInvoice = data.newCreatedInvoice;
+        this.lastUpdateTime = data.lastUpdateTime;
         this.lockedBy = data.lockedBy;
         this.lockedSince = data.lockedSince;
+        this.newCreatedInvoice = data.newCreatedInvoice;
         this.salesTaxPercentage = data.salesTaxPercentage;
         this.settingId = data.settingId;
         this.timeSpan = `${data.timespanBegin} bis ${data.timespanEnd}`; // <th>Rechnungzeitraum</th>
@@ -103,7 +109,7 @@ export class Invoice implements InvoiceType {
         const invoiceData: InvoiceType = {
             archived: !!inputInvoice.archived,
             countReminders: (typeof inputInvoice.countReminders === 'number') ? inputInvoice.countReminders : -1,
-            currency: inputInvoice.currency ? inputInvoice.currency : '€',
+            creationTime: inputInvoice.creationTime && inputInvoice.creationTime.toDate() ? inputInvoice.creationTime.toDate() : new Date(),currency: inputInvoice.currency ? inputInvoice.currency : '€',
             customerData: inputInvoice.customer ? Customer.normalizeCustomer(inputInvoice.customer) : Customer.getEmptyCustomer(),
             customerId: inputInvoice.customer.customerId ? inputInvoice.customer.customerId
                 : (inputInvoice.customerId ? inputInvoice.customerId : 'emptyCustomerId'),
@@ -117,14 +123,16 @@ export class Invoice implements InvoiceType {
             invoiceState: inputInvoice.invoiceState ? inputInvoice.invoiceState : 'Entwurf', // <th>Status (Entwurf, bezahlt, ...)</th>
             itemTypes: [],
             newCreatedInvoice: false,
+            lastUpdateTime: inputInvoice.lastUpdateTime && inputInvoice.lastUpdateTime.toDate() ? inputInvoice.lastUpdateTime.toDate() : new Date(),
             lockedBy: inputInvoice.lockedBy ? inputInvoice.lockedBy : null,
             lockedSince:  inputInvoice.lockedSince && inputInvoice.lockedSince.toDate() ? inputInvoice.lockedSince.toDate() :null,
             salesTaxPercentage: (typeof inputInvoice.salesTaxPercentage === 'number') ? inputInvoice.salesTaxPercentage : 19,
             settingId: inputInvoice.settingId,
             timeSpan: 'bspTimeSpan', // <th>Rechnungzeitraum</th>
-            timespanBegin: inputInvoice.timespanBegin.toDate ? inputInvoice.timespanBegin.toDate() : new Date(),
-            timespanEnd: inputInvoice.timespanEnd.toDate() ? inputInvoice.timespanEnd.toDate() : new Date(),
+            timespanBegin: inputInvoice.timespanBegin && inputInvoice.timespanBegin.toDate ? inputInvoice.timespanBegin.toDate() : new Date(),
+            timespanEnd: inputInvoice.timespanEnd && inputInvoice.timespanEnd.toDate() ? inputInvoice.timespanEnd.toDate() : new Date(),
             wholeCost: (typeof inputInvoice.wholeCost === 'number') ? inputInvoice.wholeCost : 0 // <th>Gesamtpreis</th>
+
         };
         // const wcType: string = typeof inputInvoice.wholeCost;
         const retInvoice: Invoice = Invoice.createInvoiceFromExistingId(inputInvoice.key, invoiceData);
@@ -216,6 +224,7 @@ export class Invoice implements InvoiceType {
         return {
             archived: archived,
             countReminders: this.countReminders, // <th>Anzahl der Mahnungen</th>
+            creationTime: this.creationTime,
             currency: this.currency,
             customer: this.customer.exportCustomerDataPlus(),
             invoiceDate: this.invoiceDate, // <th>Rechnungsdatum</th>
@@ -225,14 +234,15 @@ export class Invoice implements InvoiceType {
             invoiceNumber: this.invoiceNumber, // <th>RechnungsNr</th>
             invoiceState: this.invoiceState, // <th>Status (Entwurf, bezahlt, ...)</th>
             itemTypes: Invoice.createItemTypeArray(this.items),
-            newCreatedInvoice: this.newCreatedInvoice,
+            lastUpdateTime: new Date(),
             lockedBy: null,
             lockedSince: null,
+            newCreatedInvoice: this.newCreatedInvoice,
             salesTaxPercentage: this.salesTaxPercentage,
             settingId: this.settingId,
             timeSpan: this.timeSpan, // <th>Rechnungzeitraum</th>
             timespanBegin: this.timespanBegin,
-            timespanEnd: this.timespanEnd,
+            timespanEnd: this.timespanEnd
         };
     }
 

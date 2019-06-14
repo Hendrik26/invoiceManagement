@@ -5,6 +5,7 @@ import {ItemType} from './item-type';
 export interface InvoiceType {
     archived: boolean;
     countReminders: number; // <th>Anzahl der Mahnungen</th>
+    creationTime: Date;
     currency: string;
     customerData: CustomerType;
     customerId: string;
@@ -15,6 +16,7 @@ export interface InvoiceType {
     invoiceNumber: string; // <th>RechnungsNr</th>
     invoiceState: string; // <th>Status (Entwurf, bezahlt, ...)</th>
     itemTypes: ItemType[];
+    lastUpdateTime: Date;
     lockedBy: string;
     lockedSince:  Date;
     newCreatedInvoice: boolean;
