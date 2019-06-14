@@ -38,7 +38,8 @@ export class InvoiceDetailComponent implements OnInit {
     logoUrl: string;
     salesTax: number;
     setting: Setting;
-    timeoutCounter: string;
+    strTimeoutCounter: string;
+    timeoutCounter = -10;
     private editNewItem: boolean;
     private items: Item[];
     private oldItem: Item;
@@ -65,8 +66,11 @@ export class InvoiceDetailComponent implements OnInit {
         console.log(`\r\n\r\nInvoiceDetailComponent.ngOnInit() step 002,\r\n creatingInvoice ===${this.creatingInvoice}! \r\n\r\n`);
         if (!this.receivedInvoiceIdError && this.invoiceId) {
             this.invoiceLocked = false;
-            this.receiveInvoiceById(this.invoiceId, null);
             this.lockInvoice();
+
+            this.getTimeout();
+            this.receiveInvoiceById(this.invoiceId, null);
+
         } else {
             this.getDownloadUrl(this.setting.logoId);
         }
@@ -76,16 +80,18 @@ export class InvoiceDetailComponent implements OnInit {
         this.settingsService.timeoutAlert = null;
     }
 
-    public getTimeout(sec: number): void {
-        this.timeoutSubscription = this.fbInvoiceService.getTimeout(sec).subscribe(
-            count => {
-                const countSec = 100 + count % 60;
-                const countMin = Math.floor(count / 60);
-                this.timeoutCounter = countMin.toString() + ':' + countSec.toString().slice(1, 3);
-                if (count <= 0) {
+    public getTimeout(): void {
+        this.timeoutSubscription = this.fbInvoiceService.clock$.subscribe(
+            () => {
+                const countSec = 100 + this.timeoutCounter % 60;
+                const countMin = Math.floor(this.timeoutCounter / 60);
+                this.strTimeoutCounter = countMin.toString() + ':' + countSec.toString().slice(1, 3);
+                if (this.timeoutCounter === 0) {
+                    this.timeoutSubscription.unsubscribe();
                     this.backToInvoiceList();
                     this.settingsService.timeoutAlert = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
                 }
+                this.timeoutCounter -= 10;
             });
     }
 
@@ -234,7 +240,7 @@ export class InvoiceDetailComponent implements OnInit {
         if (!this.invoiceId) {
             return;
         }
-        this.getTimeout(this.settingsService.setting.timeoutForEdit);
+        this.timeoutCounter = this.settingsService.setting.timeoutForEdit;
         this.fbInvoiceService.lockInvoice(this.invoiceId, this.settingsService.loginUser.email, new Date()).subscribe(
             () => {
             }
@@ -245,6 +251,10 @@ export class InvoiceDetailComponent implements OnInit {
     }
 
     private unlockInvoice(): void {
+        this.timeoutCounter = -10;
+        if (this.timeoutSubscription) {
+            this.timeoutSubscription.unsubscribe();
+        }
         if (!this.invoiceId) {
             return;
         }

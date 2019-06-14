@@ -23,7 +23,7 @@ export class FbInvoiceService {
     private dbInvoicePath = '/invoices';
     private dbUserPath = '/userprofiles';
     private dbSettingPath = '/settings';
-    private clock$: Observable<Date>;
+    clock$: Observable<Date>;
 
     constructor(private firebaseAuth: AngularFireAuth,
                 private db: AngularFirestore,
