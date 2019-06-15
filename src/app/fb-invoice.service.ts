@@ -10,7 +10,7 @@ import {combineLatest, from, Observable, timer} from 'rxjs';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {AngularFireStorage} from '@angular/fire//storage';
 import * as firebase from 'firebase';
-import {map, switchMap} from 'rxjs/operators';
+import {filter, map, scan, switchMap} from 'rxjs/operators';
 import {SettingType} from './setting-type';
 
 
@@ -46,11 +46,6 @@ export class FbInvoiceService {
             + ('0' + date.getSeconds().toString()).slice(-2) + '-'
             + ('00' + date.getMilliseconds().toString()).slice(-3);
         return key;
-    }
-
-    getTimeout(sec: number): Observable<any> {
-        const date = new Date();
-        return this.clock$.pipe(map(tick => sec - Math.floor((tick.getTime() - date.getTime()) / 1000)));
     }
 
     uploadLogo(event): Observable<any> {
@@ -393,6 +388,7 @@ export class FbInvoiceService {
                      return element; });
                  return combined[0];
              }));
+
     }
     // receives te first two documents of the history - necessary to test the existence of the invoice history
     testInvoiceHistoryById(invoiceId: string): Observable<any> {
