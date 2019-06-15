@@ -12,6 +12,7 @@ import {AngularFireStorage} from '@angular/fire//storage';
 import * as firebase from 'firebase';
 import {filter, map, scan, switchMap} from 'rxjs/operators';
 import {SettingType} from './setting-type';
+import {element} from 'protractor';
 
 
 @Injectable({
@@ -381,14 +382,13 @@ export class FbInvoiceService {
                          const lockDate = lockTimestamp.toDate().getTime();
                          const testDate = combined[1].getTime();
                          if (((testDate - lockDate) / 1000 > timeoutForEdit + 30) || (element.lockedBy === userEmail)) {
-                             element.lockedBy = null;
+                             element.lockedBy = '';
                              element.lockedSince = null;
                          }
                      }
                      return element; });
                  return combined[0];
              }));
-
     }
     // receives te first two documents of the history - necessary to test the existence of the invoice history
     testInvoiceHistoryById(invoiceId: string): Observable<any> {
