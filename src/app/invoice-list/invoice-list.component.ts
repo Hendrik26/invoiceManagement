@@ -70,11 +70,10 @@ export class InvoiceListComponent implements OnInit {
         this.fbInvoiceService.getInvoiceList(refIndex, filterStartDate, filterEndDate, this.invoiceFilterState,
             invoiceFilterCompany, invoiceFilterArchive, this.settingsService.loginUser.email, this.settingsService.setting.timeoutForEdit)
             .subscribe(invoices => {
-                // console.log('INVOICES: ', invoices);
+                console.log('INVOICES: ', invoices);
                 this.invoices = invoices.map(invoice => Invoice.normalizeInvoice(invoice));
                 this.sortInvoice();
             });
-
     }
 
 

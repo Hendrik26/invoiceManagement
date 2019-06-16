@@ -237,7 +237,7 @@ export class InvoiceDetailComponent implements OnInit {
     }
 
     private lockInvoice(): void {
-        if (!this.invoiceId) {
+        if (!this.invoiceId || this.settingsService.loginUser.authorityLevel <= 1) {
             return;
         }
         this.timeoutCounter = this.settingsService.setting.timeoutForEdit;

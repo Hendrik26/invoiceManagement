@@ -10,9 +10,8 @@ import {combineLatest, from, Observable, timer} from 'rxjs';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {AngularFireStorage} from '@angular/fire//storage';
 import * as firebase from 'firebase';
-import {filter, map, scan, switchMap} from 'rxjs/operators';
+import {map, switchMap, distinctUntilChanged} from 'rxjs/operators';
 import {SettingType} from './setting-type';
-import {element} from 'protractor';
 
 
 @Injectable({
@@ -20,11 +19,11 @@ import {element} from 'protractor';
 })
 export class FbInvoiceService {
 
+    clock$: Observable<Date>;
     private dbCustomerPath = '/customers';
     private dbInvoicePath = '/invoices';
     private dbUserPath = '/userprofiles';
     private dbSettingPath = '/settings';
-    clock$: Observable<Date>;
 
     constructor(private firebaseAuth: AngularFireAuth,
                 private db: AngularFirestore,
@@ -374,22 +373,23 @@ export class FbInvoiceService {
                 }))
             ));
         return combineLatest(invoiceList$, this.clock$)
-             .pipe(map (combined => {
-                 // let x = combined[0];
-                 combined[0].forEach(element => {
-                     const lockTimestamp: any = element.lockedSince;
-                     if (lockTimestamp && lockTimestamp.toDate()) {
-                         const lockDate = lockTimestamp.toDate().getTime();
-                         const testDate = combined[1].getTime();
-                         if (((testDate - lockDate) / 1000 > timeoutForEdit + 30) || (element.lockedBy === userEmail)) {
-                             element.lockedBy = '';
-                             element.lockedSince = null;
-                         }
-                     }
-                     return element; });
-                 return combined[0];
-             }));
+            .pipe(map(combined => {
+                combined[0].forEach(element => {
+                    const lockTimestamp: any = element.lockedSince;
+                    if (lockTimestamp && lockTimestamp.toDate()) {
+                        const lockDate = lockTimestamp.toDate().getTime();
+                        const testDate = combined[1].getTime();
+                        if (((testDate - lockDate) / 1000 > timeoutForEdit + 30) || (element.lockedBy === userEmail)) {
+                            element.lockedBy = null;
+                            element.lockedSince = null;
+                        }
+                    }
+                    return element;
+                });
+                return combined[0];
+            }));
     }
+
     // receives te first two documents of the history - necessary to test the existence of the invoice history
     testInvoiceHistoryById(invoiceId: string): Observable<any> {
         // create the database reference

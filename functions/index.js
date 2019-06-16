@@ -16,7 +16,7 @@ exports.createProfile = functions.auth.user()
         let  authorityLevel = 0;
         admin.firestore().collection(userProfileCollection).get()
             .then(dataSnapshot => {
-                // first user becomes an admin
+                // first user becomes an admin credentials
                 if (dataSnapshot.size === 0) {
                     authorityLevel = 3;
                 }
@@ -36,7 +36,7 @@ exports.deleteProfile = functions.auth.user()
         return admin.firestore().collection(userProfileCollection).doc(userRecord.uid).delete();
     });
 
-// Writes a history record when a new customer document is created
+// Writes a history record if a new customer document is created
 exports.writeHistoryCreate = functions.firestore.document('/' + customerCollection + '/{documentId}')
     .onCreate((snap, context) => {
             const date = new Date();
@@ -54,7 +54,7 @@ exports.writeHistoryCreate = functions.firestore.document('/' + customerCollecti
         }
     );
 
-// Writes a history record when a customer document is updated
+// Writes a history record if a customer document is updated
 exports.writeHistoryUpdate = functions.firestore.document('/' + customerCollection + '/{documentId}')
     .onUpdate((snap, context) => {
             const date = new Date();
