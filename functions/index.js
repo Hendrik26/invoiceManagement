@@ -72,3 +72,4 @@ exports.writeHistoryUpdate = functions.firestore.document('/' + customerCollecti
         }
     );
 
+
