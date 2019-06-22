@@ -39,7 +39,9 @@ export class SettingsDetailComponent implements OnInit {
     saveSetting(): void {
         this.fbInvoiceService.saveSetting(this.settingsService.setting.exportSettingData()).subscribe(
             r => {
-                this.settingsService.settingId = r.id;
+                if (r) {
+                    this.settingsService.settingId = r.id;
+                }
             }
             , () => {
                 this.settingsService.handleDbError('Datenbankfehler', 'Error during creation of a setting document');

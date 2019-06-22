@@ -252,9 +252,9 @@ export class InvoiceDetailComponent implements OnInit {
 
     private unlockInvoice(): void {
         this.timeoutCounter = -10;
-        if (this.timeoutSubscription) {
-            this.timeoutSubscription.unsubscribe();
-        }
+        // if (this.timeoutSubscription) {
+            // this.timeoutSubscription.unsubscribe();
+        // }
         if (!this.invoiceId) {
             return;
         }
@@ -286,9 +286,9 @@ export class InvoiceDetailComponent implements OnInit {
 
     private saveInvoice(archive: boolean = false): void {
         console.log('invoice-detail.component.ts: method saveInvoice');
-        if (this.timeoutSubscription) {
-            this.timeoutSubscription.unsubscribe();
-        }
+        // if (this.timeoutSubscription) {
+            // this.timeoutSubscription.unsubscribe();
+        // }
         this.calculateSums();
         this.fbInvoiceService.updateInvoice(this.invoiceId, this.invoice.exportInvoiceToAny(archive)).subscribe(
             () => {

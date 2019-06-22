@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Invoice} from '../invoice';
 // import {isNullOrUndefined} from 'util';
 import {ThreeStateButton} from '../three-state-button';
-import {Router} from '@angular/router';
+// import {Router} from '@angular/router';
 import {FbInvoiceService} from '../fb-invoice.service';
 import {SettingsService} from '../settings.service';
 import {Customer} from '../customer';
@@ -70,7 +70,7 @@ export class InvoiceListComponent implements OnInit {
         this.fbInvoiceService.getInvoiceList(refIndex, filterStartDate, filterEndDate, this.invoiceFilterState,
             invoiceFilterCompany, invoiceFilterArchive, this.settingsService.loginUser.email, this.settingsService.setting.timeoutForEdit)
             .subscribe(invoices => {
-                console.log('INVOICES: ', invoices);
+                // console.log('INVOICES: ', invoices);
                 this.invoices = invoices.map(invoice => Invoice.normalizeInvoice(invoice));
                 this.sortInvoice();
             });

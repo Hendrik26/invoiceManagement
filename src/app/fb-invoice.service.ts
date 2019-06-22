@@ -434,6 +434,7 @@ export class FbInvoiceService {
 
     // locks or unlocks an invoice
     lockInvoice(id: string, lockedBy: string, lockedSince: Date): Observable<any> {
+        // console.log('LOCK: ', id, lockedBy);
         return from(this.db.doc(`${this.dbInvoicePath}/${id}`).update({lockedBy: lockedBy, lockedSince: lockedSince}));
     }
 
