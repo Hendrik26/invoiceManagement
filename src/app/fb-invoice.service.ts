@@ -28,7 +28,7 @@ export class FbInvoiceService {
     constructor(private firebaseAuth: AngularFireAuth,
                 private db: AngularFirestore,
                 private afStorage: AngularFireStorage) {
-        this.clock$ = timer(0, 10000).pipe(map(tick => new Date()));
+        this.clock$ = timer(0, 10000).pipe(map(() => new Date()));
     }
 
     private static historyKeyToLabel(key: string): string {

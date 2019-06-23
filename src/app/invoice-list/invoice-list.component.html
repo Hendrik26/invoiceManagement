@@ -90,7 +90,8 @@
         <!--td>{{invoice.timeSpan}}</td-->
         <td [ngStyle]="{'background-color':invoice.lockedSince ? 'red' : null }">
             <a *ngIf="!invoice.lockedSince" routerLink="/invoice-detail/{{invoice.getID()}}/false">Rechnung bearbeiten</a>
-            <span *ngIf="invoice.lockedSince">wird bearbeitet von {{invoice.lockedBy}} seit {{invoice.lockedSince  | date:'HH:mm'}}</span>
+            <span *ngIf="invoice.lockedSince">wird bearbeitet von {{invoice.lockedBy}} seit {{invoice.lockedSince  | date:'HH:mm'}}<br>
+            <a routerLink="/invoice-detail/{{invoice.getID()}}/false">Rechnung ansehen</a></span>
         </td>
     </tr>
     <!-- ///////////////////////////// -->

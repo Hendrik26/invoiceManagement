@@ -36,6 +36,7 @@ export class InvoiceDetailComponent implements OnInit {
     invoiceSelectCustomer = '----------';
     invoiceSelectCustomerDef1 = '----------';
     logoUrl: string;
+    readonly = false;
     salesTax: number;
     setting: Setting;
     strTimeoutCounter: string;
@@ -86,7 +87,7 @@ export class InvoiceDetailComponent implements OnInit {
                 const countSec = 100 + this.timeoutCounter % 60;
                 const countMin = Math.floor(this.timeoutCounter / 60);
                 this.strTimeoutCounter = countMin.toString() + ':' + countSec.toString().slice(1, 3);
-                if (this.timeoutCounter === 0) {
+                if (this.timeoutCounter === 0 && !this.readonly) {
                     this.timeoutSubscription.unsubscribe();
                     this.backToInvoiceList();
                     this.settingsService.timeoutAlert = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
@@ -229,6 +230,8 @@ export class InvoiceDetailComponent implements OnInit {
                 this.getDownloadUrl(this.setting.logoId);
                 this.calculateSums();
                 this.calculateAddress();
+                this.readonly = this.settingsService.readonly ||
+                    (this.invoice.lockedBy ? this.invoice.lockedBy === this.settingsService.loginUser.email : false);
                 this.fbInvoiceService.testInvoiceHistoryById(id).subscribe(invoiceTest => {
                     this.historyTest = invoiceTest[1];
                 });
