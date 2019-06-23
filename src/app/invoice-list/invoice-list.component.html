@@ -89,9 +89,10 @@
         <!--td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.countReminders}}</td-->
         <!--td>{{invoice.timeSpan}}</td-->
         <td [ngStyle]="{'background-color':invoice.lockedSince ? 'red' : null }">
-            <a *ngIf="!invoice.lockedSince && !settingsService.readonly" routerLink="/invoice-detail/{{invoice.getID()}}/false/false">bearbeiten</a>
-            <span *ngIf="invoice.lockedSince">{{invoice.lockedBy}} seit {{invoice.lockedSince | date:'HH:mm'}}<br></span>
-            <a routerLink="/invoice-detail/{{invoice.getID()}}/false/true">ansehen</a>
+            <span *ngIf="!invoice.lockedSince && !settingsService.readonly" >
+                <a routerLink="/invoice-detail/{{invoice.getID()}}/false/false">bearbeiten</a></span>
+            <span><a routerLink="/invoice-detail/{{invoice.getID()}}/false/true">ansehen</a></span>
+            <span *ngIf="invoice.lockedSince">{{invoice.lockedBy}} seit {{invoice.lockedSince | date:'HH:mm'}}</span>
         </td>
     </tr>
     </tbody>
