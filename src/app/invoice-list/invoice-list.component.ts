@@ -6,6 +6,7 @@ import {ThreeStateButton} from '../three-state-button';
 import {FbInvoiceService} from '../fb-invoice.service';
 import {SettingsService} from '../settings.service';
 import {Customer} from '../customer';
+import {Subscription} from 'rxjs';
 
 
 @Component({
@@ -45,7 +46,7 @@ export class InvoiceListComponent implements OnInit {
     sortStartDate: ThreeStateButton;
     // sortEndDate: ThreeStateButton;
     sortCompanyName: ThreeStateButton;
-
+    private timeoutSubscription: Subscription;
     // endregion
 
     constructor(private fbInvoiceService: FbInvoiceService,
@@ -61,13 +62,17 @@ export class InvoiceListComponent implements OnInit {
 
 
     receiveInvoices(): void {
+        if (this.timeoutSubscription) {
+            this.timeoutSubscription.unsubscribe();
+            // console.log('UNSUBSCRIBE');
+        }
         const refIndex: number = Number(this.invoiceFilterDateOption) + Number(this.invoiceFilterStateOption)
             + Number(this.invoiceFilterCompanyOption) + Number(this.invoiceFilterArchiveOption);
         const filterStartDate = this.filterStartDate ? this.filterStartDate : this.minDate;
         const filterEndDate = this.filterEndDate ? this.filterEndDate : this.maxDate;
         const invoiceFilterCompany = this.invoiceFilterCompany ? this.invoiceFilterCompany : '';
-        const invoiceFilterArchive: boolean = (this.invoiceFilterArchive == 'showArchive');
-        this.fbInvoiceService.getInvoiceList(refIndex, filterStartDate, filterEndDate, this.invoiceFilterState,
+        const invoiceFilterArchive: boolean = (this.invoiceFilterArchive === 'showArchive');
+        this.timeoutSubscription = this.fbInvoiceService.getInvoiceList(refIndex, filterStartDate, filterEndDate, this.invoiceFilterState,
             invoiceFilterCompany, invoiceFilterArchive, this.settingsService.loginUser.email, this.settingsService.setting.timeoutForEdit)
             .subscribe(invoices => {
                 // console.log('INVOICES: ', invoices);
@@ -124,7 +129,7 @@ export class InvoiceListComponent implements OnInit {
     }
 
     changeFilterState(e: string) {
-        this.invoiceFilterStateOption = e == 'Kein' ? 0 : 4;
+        this.invoiceFilterStateOption = e === 'Kein' ? 0 : 4;
         this.receiveInvoices();
     }
 
@@ -134,7 +139,7 @@ export class InvoiceListComponent implements OnInit {
     }
 
     changeFilterArchive(e: string) {
-        this.invoiceFilterArchiveOption = e == 'all' ? 0 : 16;
+        this.invoiceFilterArchiveOption = e === 'all' ? 0 : 16;
         this.receiveInvoices();
     }
 
@@ -147,15 +152,11 @@ export class InvoiceListComponent implements OnInit {
         if (!sortButtons) {
             return invoices;
         }
-        ;
-
-
         for (const sortButton of sortButtons) {
-            if (sortButton.getSortingOrderId() != 0) {
-                retInvoices = Invoice.sortInvoices(sortButton.getSortBy(), (sortButton.getSortingOrderId() == 1), invoices);
+            if (sortButton.getSortingOrderId() !== 0) {
+                retInvoices = Invoice.sortInvoices(sortButton.getSortBy(), (sortButton.getSortingOrderId() === 1), invoices);
             }
         }
-        ;
         return retInvoices;
     }
 

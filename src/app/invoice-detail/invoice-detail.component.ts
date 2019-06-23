@@ -255,12 +255,12 @@ export class InvoiceDetailComponent implements OnInit {
 
     private unlockInvoice(): void {
         this.timeoutCounter = -10;
+        if (!this.invoiceId || this.invoiceReadonly || this.settingsService.readonly) {
+            return;
+        }
         // if (this.timeoutSubscription) {
             // this.timeoutSubscription.unsubscribe();
         // }
-        if (!this.invoiceId) {
-            return;
-        }
         this.fbInvoiceService.lockInvoice(this.invoiceId, null, null).subscribe(
             () => {
             }

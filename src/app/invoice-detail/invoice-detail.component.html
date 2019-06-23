@@ -182,7 +182,7 @@
             <button *ngIf="!invoiceReadonly" (click)="saveInvoice(false)">{{invoiceId ? 'speichern' : 'erstellen'}}</button>
             <button *ngIf="invoiceId && !invoiceReadonly" (click)="saveInvoice(true)">archivieren</button>
             <button (click)="backToInvoiceList()">zurück {{strTimeoutCounter}}</button>
-            <button (click)="refreshSettings()">Einstellungen aktualisieren</button>
+            <button *ngIf="invoiceId && !invoiceReadonly" (click)="refreshSettings()">Einstellungen aktualisieren</button>
             <button *ngIf="historyTest" (click)="receiveInvoiceHistoryById(invoiceId)">alte Versionen</button>
             <select (change)="receiveInvoiceById(invoiceId,historyId)" *ngIf="historyDateList"
                     [(ngModel)]="historyId" [ngModelOptions]="{standalone: true}" >
