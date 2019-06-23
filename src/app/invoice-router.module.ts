@@ -12,7 +12,7 @@ const routes: Routes = [
     {path: '', redirectTo: '/login', pathMatch: 'full'},
     {path: 'invoice-list', component: InvoiceListComponent},
     {path: 'customer-list', component: CustomerListComponent},
-    {path: 'invoice-detail/:invoiceId/:newInvoice', component: InvoiceDetailComponent},
+    {path: 'invoice-detail/:invoiceId/:newInvoice/:invoiceReadonly', component: InvoiceDetailComponent},
     {path: 'invoice-create', component: InvoiceDetailComponent},
     {path: 'customer-detail/:customerId/:newCustomer', component: CustomerDetailComponent},
     {path: 'customer-detail/:customerId/:newCustomer/customer-history', component: CustomerListComponent},

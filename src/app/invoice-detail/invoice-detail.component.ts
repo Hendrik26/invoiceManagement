@@ -33,10 +33,10 @@ export class InvoiceDetailComponent implements OnInit {
     invoiceDate: Date;
     invoiceDueDate: Date;
     invoiceKind: InvoiceKind;
+    invoiceReadonly = false;
     invoiceSelectCustomer = '----------';
     invoiceSelectCustomerDef1 = '----------';
     logoUrl: string;
-    readonly = false;
     salesTax: number;
     setting: Setting;
     strTimeoutCounter: string;
@@ -64,6 +64,7 @@ export class InvoiceDetailComponent implements OnInit {
     ngOnInit() {
         this.creatingInvoice = false;
         this.receivedInvoiceIdError = !this.hasReceivedInvoiceId();
+        this.invoiceReadonly = this.calculateReadonly();
         console.log(`\r\n\r\nInvoiceDetailComponent.ngOnInit() step 002,\r\n creatingInvoice ===${this.creatingInvoice}! \r\n\r\n`);
         if (!this.receivedInvoiceIdError && this.invoiceId) {
             this.invoiceLocked = false;
@@ -86,8 +87,9 @@ export class InvoiceDetailComponent implements OnInit {
             () => {
                 const countSec = 100 + this.timeoutCounter % 60;
                 const countMin = Math.floor(this.timeoutCounter / 60);
-                this.strTimeoutCounter = countMin.toString() + ':' + countSec.toString().slice(1, 3);
-                if (this.timeoutCounter === 0 && !this.readonly) {
+                this.strTimeoutCounter = !this.invoiceReadonly && this.invoiceId
+                    ? countMin.toString() + ':' + countSec.toString().slice(1, 3) : '';
+                if (this.timeoutCounter === 0 && !this.invoiceReadonly && this.invoiceId) {
                     this.timeoutSubscription.unsubscribe();
                     this.backToInvoiceList();
                     this.settingsService.timeoutAlert = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
@@ -230,8 +232,6 @@ export class InvoiceDetailComponent implements OnInit {
                 this.getDownloadUrl(this.setting.logoId);
                 this.calculateSums();
                 this.calculateAddress();
-                this.readonly = this.settingsService.readonly ||
-                    (this.invoice.lockedBy ? this.invoice.lockedBy === this.settingsService.loginUser.email : false);
                 this.fbInvoiceService.testInvoiceHistoryById(id).subscribe(invoiceTest => {
                     this.historyTest = invoiceTest[1];
                 });
@@ -240,7 +240,7 @@ export class InvoiceDetailComponent implements OnInit {
     }
 
     private lockInvoice(): void {
-        if (!this.invoiceId || this.settingsService.loginUser.authorityLevel <= 1) {
+        if (!this.invoiceId || this.invoiceReadonly || this.settingsService.readonly) {
             return;
         }
         this.timeoutCounter = this.settingsService.setting.timeoutForEdit;
@@ -330,6 +330,14 @@ export class InvoiceDetailComponent implements OnInit {
         } else {
             this.invoiceId = null; // stands for the creation of a new item???? invoice
             return false;
+        }
+    }
+
+    private calculateReadonly(): boolean {
+        if (this.route.snapshot.paramMap.has('invoiceReadonly')) {
+           return this.route.snapshot.paramMap.get('invoiceReadonly') === 'true' || this.settingsService.readonly;
+        } else {
+            return this.settingsService.readonly;
         }
     }
 

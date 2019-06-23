@@ -120,11 +120,11 @@
                             {{invoice.currency}}</td>
                         <td>{{item.count * item.partialCost | number:'1.2-2'}}{{invoice.currency}}</td>
                         <td>
-                            <button *ngIf="changedItemNumber !== i && !readonly" (click)="editItemNumber(i)"
-                                             [disabled]="changedItemNumber != -1">
+                            <button *ngIf="changedItemNumber !== i && !invoiceReadonly" (click)="editItemNumber(i)"
+                                    [disabled]="changedItemNumber != -1">
                                 bearbeiten
                             </button>
-                            <button *ngIf="changedItemNumber !== i && !readonly" (click)="deleteItemNumber(i)"
+                            <button *ngIf="changedItemNumber !== i && !invoiceReadonly" (click)="deleteItemNumber(i)"
                                     [disabled]="changedItemNumber != -1">
                                 löschen
                             </button>
@@ -178,10 +178,10 @@
                     </tfoot>
                 </table>
             </div>
-            <button *ngIf="!readonly" (click)="addNewItem()">Posten hinzufügen</button>
-            <button *ngIf="!readonly" (click)="saveInvoice(false)">{{invoiceId ? 'speichern' : 'erstellen'}}</button>
-            <button *ngIf="invoiceId && !readonly"(click)="saveInvoice(true)">archivieren</button>
-            <button (click)="backToInvoiceList()">zurück in {{strTimeoutCounter}}</button>
+            <button *ngIf="!invoiceReadonly" (click)="addNewItem()">Posten hinzufügen</button>
+            <button *ngIf="!invoiceReadonly" (click)="saveInvoice(false)">{{invoiceId ? 'speichern' : 'erstellen'}}</button>
+            <button *ngIf="invoiceId && !invoiceReadonly" (click)="saveInvoice(true)">archivieren</button>
+            <button (click)="backToInvoiceList()">zurück {{strTimeoutCounter}}</button>
             <button (click)="refreshSettings()">Einstellungen aktualisieren</button>
             <button *ngIf="historyTest" (click)="receiveInvoiceHistoryById(invoiceId)">alte Versionen</button>
             <select (change)="receiveInvoiceById(invoiceId,historyId)" *ngIf="historyDateList"

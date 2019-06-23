@@ -71,10 +71,10 @@
 
         </th>
         <th>Status</th>
-        <th>Gesamtpreis</th>
+        <th>Nettopreis</th>
         <!--th>Anzahl der Mahnungen</th-->
         <!--th>Rechnungzeitraum</th-->
-        <th>Ändern</th>
+        <th>Ändern / Ansehen</th>
     </tr>
     </thead>
     <tbody>
@@ -89,17 +89,16 @@
         <!--td [ngStyle]="{'color':invoice.archived ? 'red' : 'black' }">{{invoice.countReminders}}</td-->
         <!--td>{{invoice.timeSpan}}</td-->
         <td [ngStyle]="{'background-color':invoice.lockedSince ? 'red' : null }">
-            <a *ngIf="!invoice.lockedSince" routerLink="/invoice-detail/{{invoice.getID()}}/false">Rechnung bearbeiten</a>
-            <span *ngIf="invoice.lockedSince">wird bearbeitet von {{invoice.lockedBy}} seit {{invoice.lockedSince  | date:'HH:mm'}}<br>
-            <a routerLink="/invoice-detail/{{invoice.getID()}}/false">Rechnung ansehen</a></span>
+            <a *ngIf="!invoice.lockedSince && !settingsService.readonly" routerLink="/invoice-detail/{{invoice.getID()}}/false/false">bearbeiten</a>
+            <span *ngIf="invoice.lockedSince">wird bearbeitet von {{invoice.lockedBy}} seit {{invoice.lockedSince  | date:'HH:mm'}}<br></span>
+            <a routerLink="/invoice-detail/{{invoice.getID()}}/false/true">ansehen</a>
         </td>
     </tr>
-    <!-- ///////////////////////////// -->
     </tbody>
 </table>
 
 <a routerLink="/login">Home</a>
-<a *ngIf="!settingsService.readonly" routerLink="/invoice-detail/newInvoice/true" >Neuer Rechnungsentwurf</a>
+<a *ngIf="!settingsService.readonly" routerLink="/invoice-detail/newInvoice/true/false" >Neuer Rechnungsentwurf</a>
 
 
 <a routerLink="/customer-list">Kunden bearbeiten</a>

@@ -31,11 +31,11 @@ export class LoginComponent implements OnInit {
             if (value[1]) { // value[1]: data comes from Firebase-collection userprofiles
                 this.settingsService.loginUser.authorityLevel = value[1].authorityLevel;
                 this.settingsService.loginUser.created = value[1].created.toDate();
-                this.settingsService.readonly = value[1].authorityLevel <= 1;
+                this.settingsService.invoiceReadonly = value[1].authorityLevel <= 1;
             } else {
                 this.settingsService.loginUser.authorityLevel = 0;
                 this.settingsService.loginUser.created = undefined;
-                this.settingsService.readonly = true;
+                this.settingsService.invoiceReadonly = true;
             }
             this.getLastSetting();
         });
