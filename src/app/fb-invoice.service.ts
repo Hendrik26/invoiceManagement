@@ -24,6 +24,7 @@ export class FbInvoiceService {
     private dbInvoicePath = '/invoices';
     private dbUserPath = '/userprofiles';
     private dbSettingPath = '/settings';
+    private savetyTime = 30;
 
     constructor(private firebaseAuth: AngularFireAuth,
                 private db: AngularFirestore,
@@ -231,6 +232,7 @@ export class FbInvoiceService {
     }
 
     // receives the invoice query with several filter options
+
     getInvoiceList(refIndex: number, filterStartDate: Date, filterEndDate: Date, filterState: string,
                    filterCustomer: string, filterArchive: boolean, userEmail: string, timeoutForEdit: number): Observable<any> {
         // let invoiceRef: AngularFirestoreCollection<Invoice> = null;
@@ -379,7 +381,7 @@ export class FbInvoiceService {
                     if (lockTimestamp && lockTimestamp.toDate()) {
                         const lockDate = lockTimestamp.toDate().getTime();
                         const testDate = combined[1].getTime();
-                        if (((testDate - lockDate) / 1000 > timeoutForEdit + 30) || (element.lockedBy === userEmail)) {
+                        if (((testDate - lockDate) / 1000 > timeoutForEdit + this.savetyTime) || (element.lockedBy === userEmail)) {
                             element.lockedBy = null;
                             element.lockedSince = null;
                         }
