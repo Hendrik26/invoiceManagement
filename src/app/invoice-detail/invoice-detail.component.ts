@@ -47,6 +47,7 @@ export class InvoiceDetailComponent implements OnInit {
     private receivedInvoiceIdError: boolean;
     private timeoutSubscription: Subscription;
     private invoiceLocked = false;
+    private timeoutAlertText = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
 
     constructor(
         private router: Router,
@@ -92,7 +93,7 @@ export class InvoiceDetailComponent implements OnInit {
                 if (this.timeoutCounter === 0 && !this.invoiceReadonly && this.invoiceId) {
                     this.timeoutSubscription.unsubscribe();
                     this.backToInvoiceList();
-                    this.settingsService.timeoutAlert = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
+                    this.settingsService.timeoutAlert = this.timeoutAlertText;
                 }
                 this.timeoutCounter -= 10;
             });
