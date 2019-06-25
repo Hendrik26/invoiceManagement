@@ -84,6 +84,9 @@ export class InvoiceDetailComponent implements OnInit {
     }
 
     public getTimeout(): void {
+        if (this.timeoutSubscription) {
+            this.timeoutSubscription.unsubscribe();
+        }
         this.timeoutSubscription = this.fbInvoiceService.clock$.subscribe(
             () => {
                 const countSec = 100 + this.timeoutCounter % 60;
