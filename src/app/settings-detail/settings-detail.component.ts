@@ -17,13 +17,16 @@ export class SettingsDetailComponent implements OnInit {
 
     constructor(
         private router: Router,
-        private route: ActivatedRoute,
+        // private route: ActivatedRoute,
         // private location: Location,
         private fbInvoiceService: FbInvoiceService,
         public settingsService: SettingsService) {
     }
 
     ngOnInit() {
+        if (!this.settingsService.loginUser.id) {
+            this.router.navigateByUrl('/login');
+        }
         this.getDownloadUrl(this.settingsService.setting.logoId);
         this.getSettingList();
     }

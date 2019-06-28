@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Customer} from '../customer';
 import {FbInvoiceService} from '../fb-invoice.service';
+import {SettingsService} from '../settings.service';
 
 @Component({
     selector: 'app-customer-list',
@@ -19,10 +20,13 @@ export class CustomerListComponent implements OnInit {
 
     constructor(private fbInvoiceService: FbInvoiceService,
                 private router: Router,
-                private route: ActivatedRoute) {
-    }
+                private route: ActivatedRoute,
+                public settingsService: SettingsService) {   }
 
     ngOnInit() {
+        if (!this.settingsService.loginUser.id) {
+            this.router.navigateByUrl('/login');
+        }
         this.hasReceivedCustomerParentIdError = !this.hasReceivedCustomerParentId();
         this.receiveCustomers();
     }
@@ -37,7 +41,7 @@ export class CustomerListComponent implements OnInit {
             const has: boolean = this.route.snapshot.paramMap.has('customer-history');
             const get: string = this.route.snapshot.paramMap.get('customer-history');
             const urlToString: string = this.route.snapshot.toString();
-            this.history = (urlToString.indexOf('customer-history') != -1);
+            this.history = (urlToString.indexOf('customer-history') !== -1);
             return true;
         } else {
             this.customerParentId = null; // stands for the creation of a new customer

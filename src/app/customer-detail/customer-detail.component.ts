@@ -28,12 +28,15 @@ export class CustomerDetailComponent implements OnInit {
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private location: Location,
+        // private location: Location,
         private fbInvoiceService: FbInvoiceService,
         private settingsService: SettingsService) {
     }
 
     ngOnInit() {
+        if (!this.settingsService.loginUser.id) {
+            this.router.navigateByUrl('/login');
+        }
         this.newCustomer = false;
         this.receivedCustomerIdError = !this.hasReceivedCustomerId();
         if (!this.receivedCustomerIdError) {

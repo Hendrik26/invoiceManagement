@@ -2,11 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {Invoice} from '../invoice';
 // import {isNullOrUndefined} from 'util';
 import {ThreeStateButton} from '../three-state-button';
-// import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FbInvoiceService} from '../fb-invoice.service';
 import {SettingsService} from '../settings.service';
 import {Customer} from '../customer';
 import {Subscription} from 'rxjs';
+import {Location} from '@angular/common';
 
 
 @Component({
@@ -49,10 +50,17 @@ export class InvoiceListComponent implements OnInit {
     private timeoutSubscription: Subscription;
     // endregion
 
-    constructor(private fbInvoiceService: FbInvoiceService,
-                public settingsService: SettingsService) { }
+    constructor(
+        private router: Router,
+        // private route: ActivatedRoute,
+        // private location: Location,
+        private fbInvoiceService: FbInvoiceService,
+        public settingsService: SettingsService) { }
 
     ngOnInit() {
+        if (!this.settingsService.loginUser.id) {
+            this.router.navigateByUrl('/login');
+        }
         this.sortStartDueDate = new ThreeStateButton('DueDate');
         this.sortStartDate = new ThreeStateButton('Date');
         this.sortCompanyName = new ThreeStateButton('CompanyName');
@@ -60,11 +68,9 @@ export class InvoiceListComponent implements OnInit {
         this.receiveCustomers();
     }
 
-
-    receiveInvoices(): void {
+    private receiveInvoices(): void {
         if (this.timeoutSubscription) {
             this.timeoutSubscription.unsubscribe();
-            // console.log('UNSUBSCRIBE');
         }
         const refIndex: number = Number(this.invoiceFilterDateOption) + Number(this.invoiceFilterStateOption)
             + Number(this.invoiceFilterCompanyOption) + Number(this.invoiceFilterArchiveOption);
@@ -81,8 +87,7 @@ export class InvoiceListComponent implements OnInit {
             });
     }
 
-
-    receiveCustomers(): void {
+    private receiveCustomers(): void {
         this.fbInvoiceService.getCustomersList('notArchive')
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));

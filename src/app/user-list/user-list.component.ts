@@ -20,6 +20,9 @@ export class UserListComponent implements OnInit {
 
 
     ngOnInit() {
+        if (!this.settingsService.loginUser.id) {
+            this.router.navigateByUrl('/login');
+        }
         this.receiveUsers();
     }
 

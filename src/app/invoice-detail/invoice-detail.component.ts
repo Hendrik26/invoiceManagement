@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, HostListener} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Location} from '@angular/common';
 import {Invoice} from '../invoice';
@@ -49,10 +49,14 @@ export class InvoiceDetailComponent implements OnInit {
     private invoiceLocked = false;
     private timeoutAlertText = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
 
+    @HostListener('window:beforeunload') goToPage() {
+        this.router.navigate(['/login']);
+    }
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private location: Location,
+        // private location: Location,
         private fbInvoiceService: FbInvoiceService,
         public settingsService: SettingsService
     ) {
@@ -63,19 +67,22 @@ export class InvoiceDetailComponent implements OnInit {
     }
 
     ngOnInit() {
+        if (!this.settingsService.loginUser.id) {
+            this.router.navigateByUrl('/login');
+        }
         this.creatingInvoice = false;
         this.receivedInvoiceIdError = !this.hasReceivedInvoiceId();
         this.invoiceReadonly = this.calculateReadonly();
+        if (this.setting.logoId) {
+            this.getDownloadUrl(this.setting.logoId);
+        }
         console.log(`\r\n\r\nInvoiceDetailComponent.ngOnInit() step 002,\r\n creatingInvoice ===${this.creatingInvoice}! \r\n\r\n`);
+        console.log('MMMMM', this.settingsService.loginUser);
         if (!this.receivedInvoiceIdError && this.invoiceId) {
             this.invoiceLocked = false;
             this.lockInvoice();
-
             this.getTimeout();
             this.receiveInvoiceById(this.invoiceId, null);
-
-        } else {
-            this.getDownloadUrl(this.setting.logoId);
         }
         this.calculateSums();
         this.receiveCustomers();
