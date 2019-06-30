@@ -1,4 +1,4 @@
-import {Component, OnInit, HostListener} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Location} from '@angular/common';
 import {Invoice} from '../invoice';
@@ -15,7 +15,7 @@ import {Subscription} from 'rxjs';
     templateUrl: './invoice-detail.component.html',
     styleUrls: ['./invoice-detail.component.css']
 })
-export class InvoiceDetailComponent implements OnInit {
+export class InvoiceDetailComponent implements OnInit, OnDestroy {
 
     invoiceId: string;
 
@@ -41,17 +41,17 @@ export class InvoiceDetailComponent implements OnInit {
     setting: Setting;
     strTimeoutCounter: string;
     timeoutCounter = -10;
+    private customerSubscription: Subscription;
+    private dataSubscription: Subscription;
+    private downloadSubscription: Subscription;
     private editNewItem: boolean;
+    private historySubscription: Subscription;
     private items: Item[];
     private oldItem: Item;
     private receivedInvoiceIdError: boolean;
     private timeoutSubscription: Subscription;
     private invoiceLocked = false;
     private timeoutAlertText = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
-
-    @HostListener('window:beforeunload') goToPage() {
-        this.router.navigate(['/login']);
-    }
 
     constructor(
         private router: Router,
@@ -64,6 +64,25 @@ export class InvoiceDetailComponent implements OnInit {
         this.invoiceKind = InvoiceKind.create(false, false, false);
         this.setting = this.settingsService.setting;
         this.invoice.settingId = this.settingsService.settingId;
+    }
+
+    ngOnDestroy(): void {
+        // console.log('DESTROY');
+        if (this.timeoutSubscription) {
+            this.timeoutSubscription.unsubscribe();
+        }
+        if (this.dataSubscription) {
+            this.dataSubscription.unsubscribe();
+        }
+        if (this.customerSubscription) {
+            this.customerSubscription.unsubscribe();
+        }
+        if (this.downloadSubscription) {
+            this.downloadSubscription.unsubscribe();
+        }
+        if (this.historySubscription) {
+            this.historySubscription.unsubscribe();
+        }
     }
 
     ngOnInit() {
@@ -98,6 +117,7 @@ export class InvoiceDetailComponent implements OnInit {
                 const countMin = Math.floor(this.timeoutCounter / 60);
                 this.strTimeoutCounter = !this.invoiceReadonly && this.invoiceId
                     ? countMin.toString() + ':' + countSec.toString().slice(1, 3) : '';
+                console.log('Timeout', this.strTimeoutCounter);
                 if (this.timeoutCounter === 0 && !this.invoiceReadonly && this.invoiceId) {
                     this.timeoutSubscription.unsubscribe();
                     this.backToInvoiceList();
@@ -108,7 +128,7 @@ export class InvoiceDetailComponent implements OnInit {
     }
 
     public receiveCustomers(): void {
-        this.fbInvoiceService.getCustomersList('notArchive')
+        this.customerSubscription =  this.dataSubscription = this.fbInvoiceService.getCustomersList('notArchive')
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
             });
@@ -136,7 +156,7 @@ export class InvoiceDetailComponent implements OnInit {
     }
 
     public receiveInvoiceHistoryById(id: string): void {
-        this.fbInvoiceService.getInvoiceHistoryById(id)
+        this.historySubscription = this.fbInvoiceService.getInvoiceHistoryById(id)
             .subscribe(data => {
                 this.historyDateList = data;
             });
@@ -227,7 +247,7 @@ export class InvoiceDetailComponent implements OnInit {
     }
 
     private receiveInvoiceById(id: string, historyId: string): void {
-        this.timeoutSubscription = this.fbInvoiceService.getInvoiceById(id, historyId, this.settingsService.settingId).subscribe(c => {
+        this.dataSubscription = this.fbInvoiceService.getInvoiceById(id, historyId, this.settingsService.settingId).subscribe(c => {
             if (!this.invoiceLocked) {
                 this.invoice = Invoice.normalizeInvoice(c[0]);
                 if (c[1]) {
@@ -267,9 +287,6 @@ export class InvoiceDetailComponent implements OnInit {
         if (!this.invoiceId || this.invoiceReadonly || this.settingsService.readonly) {
             return;
         }
-        // if (this.timeoutSubscription) {
-            // this.timeoutSubscription.unsubscribe();
-        // }
         this.fbInvoiceService.lockInvoice(this.invoiceId, null, null).subscribe(
             () => {
             }
@@ -286,7 +303,7 @@ export class InvoiceDetailComponent implements OnInit {
         if (id.length === 0) {
             return;
         }
-        this.fbInvoiceService.getDownloadUrl(id).subscribe(
+        this.downloadSubscription =  this.fbInvoiceService.getDownloadUrl(id).subscribe(
             r => {
                 this.logoUrl = r;
             }
@@ -298,9 +315,6 @@ export class InvoiceDetailComponent implements OnInit {
 
     private saveInvoice(archive: boolean = false): void {
         console.log('invoice-detail.component.ts: method saveInvoice');
-        // if (this.timeoutSubscription) {
-            // this.timeoutSubscription.unsubscribe();
-        // }
         this.calculateSums();
         this.fbInvoiceService.updateInvoice(this.invoiceId, this.invoice.exportInvoiceToAny(archive)).subscribe(
             () => {

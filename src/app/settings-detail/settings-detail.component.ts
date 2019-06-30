@@ -1,19 +1,21 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {FbInvoiceService} from '../fb-invoice.service';
 import {SettingsService} from '../settings.service';
 import {Setting} from '../setting';
+import {Subscription} from 'rxjs';
 
 @Component({
     selector: 'app-settings-detail',
     templateUrl: './settings-detail.component.html',
     styleUrls: ['./settings-detail.component.css']
 })
-export class SettingsDetailComponent implements OnInit {
+export class SettingsDetailComponent implements OnInit, OnDestroy {
 
     public enableSaveButton = true;
     public settingList: object;
     public settingId: undefined;
+    private dataSubscription: Subscription;
 
     constructor(
         private router: Router,
@@ -21,6 +23,12 @@ export class SettingsDetailComponent implements OnInit {
         // private location: Location,
         private fbInvoiceService: FbInvoiceService,
         public settingsService: SettingsService) {
+    }
+
+    ngOnDestroy(): void {
+        if (this.dataSubscription) {
+            this.dataSubscription.unsubscribe();
+        }
     }
 
     ngOnInit() {
@@ -32,7 +40,7 @@ export class SettingsDetailComponent implements OnInit {
     }
 
     getSettingList(): void {
-        this.fbInvoiceService.getSettingList().subscribe(
+        this.dataSubscription = this.fbInvoiceService.getSettingList().subscribe(
             r => {
                 this.settingList = r;
             }

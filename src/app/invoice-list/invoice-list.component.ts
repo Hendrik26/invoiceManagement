@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {Invoice} from '../invoice';
 // import {isNullOrUndefined} from 'util';
 import {ThreeStateButton} from '../three-state-button';
@@ -16,7 +16,7 @@ import {Subscription} from 'rxjs';
 })
 
 
-export class InvoiceListComponent implements OnInit {
+export class InvoiceListComponent implements OnInit, OnDestroy {
 
     customers: Customer[];
     filterEndDate: Date;
@@ -35,6 +35,7 @@ export class InvoiceListComponent implements OnInit {
     sortStartDate: ThreeStateButton;
     sortStartDueDate: ThreeStateButton;
     private timeoutSubscription: Subscription;
+    private customerSubscription: Subscription;
 
     constructor(
         private router: Router,
@@ -43,6 +44,16 @@ export class InvoiceListComponent implements OnInit {
         private fbInvoiceService: FbInvoiceService,
         public settingsService: SettingsService) {
     }
+
+    ngOnDestroy(): void {
+        if (this.customerSubscription) {
+            this.customerSubscription.unsubscribe();
+        }
+        if (this.timeoutSubscription) {
+            this.timeoutSubscription.unsubscribe();
+        }
+    }
+
 
     ngOnInit() {
         if (!this.settingsService.loginUser.id) {
@@ -148,7 +159,7 @@ export class InvoiceListComponent implements OnInit {
     }
 
     private receiveCustomers(): void {
-        this.fbInvoiceService.getCustomersList('notArchive')
+        this.customerSubscription = this.fbInvoiceService.getCustomersList('notArchive')
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
             });

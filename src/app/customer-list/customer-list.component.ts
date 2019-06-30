@@ -1,18 +1,20 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Customer} from '../customer';
 import {FbInvoiceService} from '../fb-invoice.service';
 import {SettingsService} from '../settings.service';
+import {Subscription} from 'rxjs';
 
 @Component({
     selector: 'app-customer-list',
     templateUrl: './customer-list.component.html',
     styleUrls: ['./customer-list.component.css']
 })
-export class CustomerListComponent implements OnInit {
+export class CustomerListComponent implements OnInit, OnDestroy  {
 
     customerParentId: string;
     customers: Customer[];
+    private dataSubscription: Subscription;
     hasReceivedCustomerParentIdError = false;
     history = false;
     newParentCustomer = false;
@@ -22,6 +24,12 @@ export class CustomerListComponent implements OnInit {
                 private router: Router,
                 private route: ActivatedRoute,
                 public settingsService: SettingsService) {   }
+
+    ngOnDestroy(): void {
+        if (this.dataSubscription) {
+            this.dataSubscription.unsubscribe();
+        }
+    }
 
     ngOnInit() {
         if (!this.settingsService.loginUser.id) {
@@ -50,7 +58,7 @@ export class CustomerListComponent implements OnInit {
     }
 
     receiveCustomers(): void {
-        this.fbInvoiceService.getCustomersList(this.showArchive)
+        this.dataSubscription = this.fbInvoiceService.getCustomersList(this.showArchive)
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
             });

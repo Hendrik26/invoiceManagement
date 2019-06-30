@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Customer} from '../customer';
 import {CustomerType} from '../customer-type';
 import {FbInvoiceService} from '../fb-invoice.service';
 import {SettingsService} from '../settings.service';
+import {Subscription} from 'rxjs';
 
 
 @Component({
@@ -11,7 +12,7 @@ import {SettingsService} from '../settings.service';
     templateUrl: './customer-detail.component.html',
     styleUrls: ['./customer-detail.component.css']
 })
-export class CustomerDetailComponent implements OnInit {
+export class CustomerDetailComponent implements OnInit, OnDestroy {
 
 
     customerId: string;
@@ -23,6 +24,8 @@ export class CustomerDetailComponent implements OnInit {
     historyTest: boolean;
     newCustomer: boolean;
     receivedCustomerIdError: boolean;
+    private dataSubscription: Subscription;
+    private historySubscription: Subscription;
 
     constructor(
         private router: Router,
@@ -30,6 +33,15 @@ export class CustomerDetailComponent implements OnInit {
         // private location: Location,
         private fbInvoiceService: FbInvoiceService,
         private settingsService: SettingsService) {
+    }
+
+    ngOnDestroy(): void {
+        if (this.historySubscription) {
+            this.historySubscription.unsubscribe();
+        }
+        if (this.dataSubscription) {
+            this.dataSubscription.unsubscribe();
+        }
     }
 
     ngOnInit() {
@@ -76,7 +88,7 @@ export class CustomerDetailComponent implements OnInit {
     }
 
     receiveCustomerHistoryById(id: string): void {
-        this.fbInvoiceService.getCustomerHistoryById(id)
+        this.historySubscription = this.fbInvoiceService.getCustomerHistoryById(id)
             .subscribe(data => {
                 this.historyDateList = data;
             });
@@ -96,10 +108,10 @@ export class CustomerDetailComponent implements OnInit {
 
     private receiveFbCustomerById(id: string, historyId: string): void {
         if (!this.newCustomer) {
-            this.fbInvoiceService.getCustomerById(id, historyId).subscribe(customerType => {
+            this.dataSubscription = this.fbInvoiceService.getCustomerById(id, historyId).subscribe(customerType => {
                 this.customer = new Customer(id, customerType);
             });
-            this.fbInvoiceService.testCustomerHistoryById(id).subscribe(customerTest => {
+            this.dataSubscription = this.fbInvoiceService.testCustomerHistoryById(id).subscribe(customerTest => {
                 this.historyTest = customerTest[1];
             });
         } else {
