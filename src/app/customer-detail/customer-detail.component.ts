@@ -25,7 +25,8 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
     newCustomer: boolean;
     receivedCustomerIdError: boolean;
     private dataSubscription: Subscription;
-    private historySubscription: Subscription;
+    private historySubscription1: Subscription;
+    private historySubscription2: Subscription;
 
     constructor(
         private router: Router,
@@ -36,9 +37,12 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.historySubscription) {
-            this.historySubscription.unsubscribe();
+        if (this.historySubscription1) {
+            this.historySubscription1.unsubscribe();
         }
+      if (this.historySubscription2) {
+        this.historySubscription2.unsubscribe();
+      }
         if (this.dataSubscription) {
             this.dataSubscription.unsubscribe();
         }
@@ -88,7 +92,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
     }
 
     receiveCustomerHistoryById(id: string): void {
-        this.historySubscription = this.fbInvoiceService.getCustomerHistoryById(id)
+        this.historySubscription1 = this.fbInvoiceService.getCustomerHistoryById(id)
             .subscribe(data => {
                 this.historyDateList = data;
             });
@@ -111,7 +115,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
             this.dataSubscription = this.fbInvoiceService.getCustomerById(id, historyId).subscribe(customerType => {
                 this.customer = new Customer(id, customerType);
             });
-            this.dataSubscription = this.fbInvoiceService.testCustomerHistoryById(id).subscribe(customerTest => {
+          this.historySubscription2 = this.fbInvoiceService.testCustomerHistoryById(id).subscribe(customerTest => {
                 this.historyTest = customerTest[1];
             });
         } else {
