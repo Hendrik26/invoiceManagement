@@ -67,7 +67,6 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        // console.log('DESTROY');
         if (this.timeoutSubscription) {
             this.timeoutSubscription.unsubscribe();
         }
@@ -117,7 +116,6 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
                 const countMin = Math.floor(this.timeoutCounter / 60);
                 this.strTimeoutCounter = !this.invoiceReadonly && this.invoiceId
                     ? countMin.toString() + ':' + countSec.toString().slice(1, 3) : '';
-                console.log('Timeout', this.strTimeoutCounter);
                 if (this.timeoutCounter === 0 && !this.invoiceReadonly && this.invoiceId) {
                     this.timeoutSubscription.unsubscribe();
                     this.backToInvoiceList();
