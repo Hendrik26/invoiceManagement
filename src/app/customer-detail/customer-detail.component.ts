@@ -3,7 +3,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Customer} from '../customer';
 import {CustomerType} from '../customer-type';
 import {FbInvoiceService} from '../fb-invoice.service';
-import {Location} from '@angular/common';
 import {SettingsService} from '../settings.service';
 
 

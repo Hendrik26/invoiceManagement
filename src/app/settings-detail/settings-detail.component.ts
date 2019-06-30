@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {FbInvoiceService} from '../fb-invoice.service';
 import {SettingsService} from '../settings.service';
 import {Setting} from '../setting';
@@ -99,8 +99,7 @@ export class SettingsDetailComponent implements OnInit {
         this.fbInvoiceService.getDownloadUrl(id).subscribe(
             r => {
                 this.settingsService.logoUrl = r;
-            }
-            , () => {
+            }, () => {
                 this.settingsService.handleDbError('Speicherfehler', 'Error during downloading a file');
             }
         );

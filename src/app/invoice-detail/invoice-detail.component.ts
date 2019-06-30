@@ -77,7 +77,6 @@ export class InvoiceDetailComponent implements OnInit {
             this.getDownloadUrl(this.setting.logoId);
         }
         console.log(`\r\n\r\nInvoiceDetailComponent.ngOnInit() step 002,\r\n creatingInvoice ===${this.creatingInvoice}! \r\n\r\n`);
-        console.log('MMMMM', this.settingsService.loginUser);
         if (!this.receivedInvoiceIdError && this.invoiceId) {
             this.invoiceLocked = false;
             this.lockInvoice();
@@ -86,7 +85,6 @@ export class InvoiceDetailComponent implements OnInit {
         }
         this.calculateSums();
         this.receiveCustomers();
-        // this.getTimeout(this.settingsService.setting.timeoutForEdit);
         this.settingsService.timeoutAlert = null;
     }
 

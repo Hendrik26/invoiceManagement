@@ -31,7 +31,7 @@ export class CustomerListComponent implements OnInit {
         this.receiveCustomers();
     }
 
-    hasReceivedCustomerParentId(): // can NOT be deleted
+    private hasReceivedCustomerParentId(): // can NOT be deleted
         boolean {
         // let tempStr: string = 'tempStr';
         console.log('<<< Start method hasReceivedCustomerParentId()! >>>');
