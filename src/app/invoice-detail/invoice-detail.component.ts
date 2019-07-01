@@ -51,6 +51,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
     private oldItem: Item;
     private receivedInvoiceIdError: boolean;
     private saveSubscription: Subscription;
+    private settingsSubscription: Subscription;
     private timeoutAlertText = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
     private timeoutSubscription: Subscription;
     private unlockSubscription: Subscription;
@@ -93,12 +94,16 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
         if (this.unlockSubscription) {
             this.unlockSubscription.unsubscribe();
         }
+        if (this.settingsSubscription) {
+            this.settingsSubscription.unsubscribe();
+        }
     }
 
     ngOnInit() {
         if (!this.settingsService.loginUser.id) {
             this.router.navigateByUrl('/login');
         }
+        this.getLastSetting();
         this.creatingInvoice = false;
         this.receivedInvoiceIdError = !this.hasReceivedInvoiceId();
         this.invoiceReadonly = this.calculateReadonly();
@@ -115,37 +120,6 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
         this.calculateSums();
         this.receiveCustomers();
         this.settingsService.timeoutAlert = null;
-    }
-
-    public getTimeout(): void {
-        if (this.timeoutSubscription) {
-            this.timeoutSubscription.unsubscribe();
-        }
-        this.timeoutSubscription = this.fbInvoiceService.clock$.subscribe(
-            () => {
-                const countSec = 100 + this.timeoutCounter % 60;
-                const countMin = Math.floor(this.timeoutCounter / 60);
-                this.strTimeoutCounter = !this.invoiceReadonly && this.invoiceId
-                    ? countMin.toString() + ':' + countSec.toString().slice(1, 3) : '';
-                if (this.timeoutCounter === 0 && !this.invoiceReadonly && this.invoiceId) {
-                    this.timeoutSubscription.unsubscribe();
-                    this.backToInvoiceList();
-                    this.settingsService.timeoutAlert = this.timeoutAlertText;
-                }
-                this.timeoutCounter -= 10;
-            });
-    }
-
-    public receiveCustomers(): void {
-        if (this.settingsService.readonly) {
-            return;
-        }
-        this.customerSubscription = this.dataSubscription = this.fbInvoiceService.getCustomersList('notArchive')
-            .subscribe(data => {
-                this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
-            }, () => {
-                this.settingsService.handleDbError('Datenbankfehler', 'Error during read the customer list');
-            });
     }
 
     public changeFilterCompany(e: string): void {
@@ -211,6 +185,52 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
         }
         this.unlockInvoice();
         this.router.navigateByUrl('/invoice-list');
+    }
+
+    private getTimeout(): void {
+        if (this.timeoutSubscription) {
+            this.timeoutSubscription.unsubscribe();
+        }
+        this.timeoutSubscription = this.fbInvoiceService.clock$.subscribe(
+            () => {
+                const countSec = 100 + this.timeoutCounter % 60;
+                const countMin = Math.floor(this.timeoutCounter / 60);
+                this.strTimeoutCounter = !this.invoiceReadonly && this.invoiceId
+                    ? countMin.toString() + ':' + countSec.toString().slice(1, 3) : '';
+                if (this.timeoutCounter === 0 && !this.invoiceReadonly && this.invoiceId) {
+                    this.timeoutSubscription.unsubscribe();
+                    this.backToInvoiceList();
+                    this.settingsService.timeoutAlert = this.timeoutAlertText;
+                }
+                this.timeoutCounter -= 10;
+            });
+    }
+
+    private getLastSetting(): void {
+        if (this.settingsSubscription) {
+            this.settingsSubscription.unsubscribe();
+        }
+        this.settingsSubscription = this.fbInvoiceService.getLastSetting()
+            .subscribe(s => {
+                if (s) {
+                    this.settingsService.setting = Setting.normalizeSetting(s[0]);
+                    this.settingsService.settingId = s[0].key;
+                }
+            }, () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during read the settings');
+            });
+    }
+
+    private receiveCustomers(): void {
+        if (this.settingsService.readonly) {
+            return;
+        }
+        this.customerSubscription = this.dataSubscription = this.fbInvoiceService.getCustomersList('notArchive')
+            .subscribe(data => {
+                this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
+            }, () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during read the customer list');
+            });
     }
 
     private editItemNumber(row: number): void {
@@ -289,12 +309,12 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
         this.timeoutCounter = this.settingsService.setting.timeoutForEdit;
         this.lockSubscription = this.fbInvoiceService
             .lockInvoice(this.invoiceId, this.settingsService.loginUser.email, new Date()).subscribe(
-            () => {
-            }
-            , () => {
-                this.settingsService.handleDbError('Datenbankfehler', 'Error during locking a invoice');
-            }
-        );
+                () => {
+                }
+                , () => {
+                    this.settingsService.handleDbError('Datenbankfehler', 'Error during locking a invoice');
+                }
+            );
     }
 
     private unlockInvoice(): void {
