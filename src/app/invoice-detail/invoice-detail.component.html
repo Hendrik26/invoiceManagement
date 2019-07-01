@@ -5,7 +5,8 @@
                 <!--SednaSoft GbR, Biesnitzer Straße 8, 02826 Görlitz-->
                 {{setting.headerShortAddress}}
             </div><!-- class="postage-info" -->
-            <select [(ngModel)]="invoiceSelectCustomer" (ngModelChange)="changeFilterCompany($event)">
+            <select [(ngModel)]="invoiceSelectCustomer" (ngModelChange)="changeFilterCompany($event)"
+                    [disabled]="invoiceReadonly">
                 <option selected [ngValue]="invoiceSelectCustomerDef1">
                     {{invoice.customer.customerName}}
                 </option>
@@ -22,11 +23,11 @@
 
         <div class="checkboxfield">
             <label><input type="checkbox" name="international" [checked]="invoice.invoiceKind.international"
-                          (change)="changeInternational()"> Auslandsrechnung</label>
+                          (change)="changeInternational()" [disabled]="invoiceReadonly"> Auslandsrechnung</label>
             <label><input type="checkbox" name="timeSpanBased" [checked]="invoice.invoiceKind.timeSpanBased"
-                          (change)="changeTimeSpanBased()"> Zeitraumbasiert</label>
+                          (change)="changeTimeSpanBased()" [disabled]="invoiceReadonly"> Zeitraumbasiert</label>
             <label><input type="checkbox" name="isSEPA" [checked]="invoice.invoiceKind.isSEPA"
-                          (change)="changeIsSEPA()"> SEPA-Lastschriftmandat</label>
+                          (change)="changeIsSEPA()" [disabled]="invoiceReadonly"> SEPA-Lastschriftmandat</label>
         </div>
 
 
@@ -57,24 +58,24 @@
         <section>
             <div class="city-date">{{setting.headerLocation}},
                 <input type="date" name="inDate" [ngModel]="invoice.invoiceDate | date:'yyyy-MM-dd'"
-                       (ngModelChange)="invoiceDateChange($event)">
+                       (ngModelChange)="invoiceDateChange($event)" [disabled]="invoiceReadonly">
             </div>
 
             <h1 class="invoice-number" [ngStyle]="{'color': invoice.archived ? 'red' : 'black' }">Rechnung
                 <input class="invoice-number" [ngStyle]="{'color': invoice.archived ? 'red' : 'black' }"
                        [ngModel]="invoice.invoiceNumber"
-                       (ngModelChange)="invoiceNumberChange($event)">
+                       (ngModelChange)="invoiceNumberChange($event)" [disabled]="invoiceReadonly">
             </h1>
             <!-- p>Zeitraum: 2018-01-01 bis 2018-12-31 (12 Monate)</p>
           <input class="timeSpan" class="inputLarge" [(ngModel)]="invoiceTimeSpan" -->
             <div class="timespan" *ngIf="invoice.invoiceKind.timeSpanBased">
                 Zeitraum:
                 <input type="date" name="inStartDate" [ngModel]="invoice.timespanBegin | date:'yyyy-MM-dd'"
-                       (ngModelChange)="invoiceTimespanBeginChange($event)">
+                       (ngModelChange)="invoiceTimespanBeginChange($event)" [disabled]="invoiceReadonly">
                 bis
                 <input type="date" name="inStartDate"
                        [ngModel]="invoice.timespanEnd ? (invoice.timespanEnd | date:'yyyy-MM-dd') : ''"
-                       (ngModelChange)="invoiceTimespanEndChange($event)">
+                       (ngModelChange)="invoiceTimespanEndChange($event)" [disabled]="invoiceReadonly">
                 {{timespan()}}
             </div>
 
@@ -107,16 +108,16 @@
                                                                    [(ngModel)]="changedItem.itemDate"></td>
                         <td *ngIf="changedItemNumber !== i">{{item.count}}</td>
                         <td *ngIf="changedItemNumber === i"><input type="text" name="changedItem" size="7"
-                                                                   [(ngModel)] = "changedItem.count"
+                                                                   [(ngModel)]="changedItem.count"
                                                                    (ngModelChange)="calculateSums()">
                         </td>
                         <!-- td>{{item.partialCost | number:'1.2-2'}}{{invoiceCurrency}}</td -->
                         <td *ngIf="changedItemNumber !== i">{{item.partialCostString(invoice.currency)}}</td>
                         <td *ngIf="changedItemNumber === i"><input type="text" name="changedItem" size="7"
                                                                    [(ngModel)]="changedItem.partialCost"
-                                                                   (ngModelChange) = "calculateSums()">
+                                                                   (ngModelChange)="calculateSums()">
                             <label>Stundenpreis</label>
-                            <input type="checkbox" [(ngModel)] = "changedItem.hourPayment">
+                            <input type="checkbox" [(ngModel)]="changedItem.hourPayment">
                             {{invoice.currency}}</td>
                         <td>{{item.count * item.partialCost | number:'1.2-2'}}{{invoice.currency}}</td>
                         <td>
@@ -146,7 +147,9 @@
                     </tr>
                     <tr *ngIf="!invoice.invoiceKind.international">
                         <td colspan="4"></td>
-                        <td>{{!invoice.invoiceKind.international ? (invoice.salesTaxPercentage | number:'1.0-1') + '%' : ''}} MwSt.</td>
+                        <td>{{!invoice.invoiceKind.international ? (invoice.salesTaxPercentage | number:'1.0-1') + '%' : ''}}
+                            MwSt.
+                        </td>
                         <td> {{!invoice.invoiceKind.international ? (salesTax | number:'1.2-2') : 'Brutto == Netto '}}{{invoice.currency}}</td>
                         <td>
                             <!--button type="button">Mehrwertsteuer ändern</button-->
@@ -156,7 +159,7 @@
                         <td colspan="4"></td>
                         <td>Rechnungsbetrag</td>
                         <td> {{bruttoSum | number:'1.2-2'}}
-                            <select name="invoiceCurrency" [(ngModel)]="invoice.currency">
+                            <select name="invoiceCurrency" [(ngModel)]="invoice.currency" [disabled]="invoiceReadonly">
                                 <option value="€">€</option>
                                 <option value="USD">USD</option>
                                 <option value="GBP">GBP</option> <!-- Great -->
@@ -166,7 +169,7 @@
                             </select>
                         </td>
                         <td>
-                            <select name="invoiceState" [(ngModel)]="invoice.invoiceState">
+                            <select name="invoiceState" [(ngModel)]="invoice.invoiceState" [disabled]="invoiceReadonly">
                                 <option value="Entwurf">Entwurf</option>
                                 <option value="offen">offen</option>
                                 <option value="teilweise bezahlt">teilweise bezahlt</option>
@@ -178,13 +181,15 @@
                 </table>
             </div>
             <button *ngIf="!invoiceReadonly" (click)="addNewItem()">Posten hinzufügen</button>
-            <button *ngIf="!invoiceReadonly" (click)="saveInvoice(false)">{{invoiceId ? 'speichern' : 'erstellen'}}</button>
+            <button *ngIf="!invoiceReadonly"
+                    (click)="saveInvoice(false)">{{invoiceId ? 'speichern' : 'erstellen'}}</button>
             <button *ngIf="invoiceId && !invoiceReadonly" (click)="saveInvoice(true)">archivieren</button>
             <button (click)="backToInvoiceList()">zurück {{strTimeoutCounter}}</button>
-            <button *ngIf="invoiceId && !invoiceReadonly" (click)="refreshSettings()">Einstellungen aktualisieren</button>
+            <button *ngIf="invoiceId && !invoiceReadonly" (click)="refreshSettings()">Einstellungen aktualisieren
+            </button>
             <button *ngIf="historyTest" (click)="receiveInvoiceHistoryById(invoiceId)">alte Versionen</button>
             <select (change)="receiveInvoiceById(invoiceId,historyId)" *ngIf="historyDateList"
-                    [(ngModel)]="historyId" [ngModelOptions]="{standalone: true}" >
+                    [(ngModel)]="historyId" [ngModelOptions]="{standalone: true}">
                 <option selected [ngValue]="undefined">
                     aktuell
                 </option>
@@ -210,10 +215,11 @@
             <div *ngIf="!invoice.invoiceKind.isSEPA">
                 <p>Bitte überweisen Sie den Rechnungsbetrag bis zum
                     <input type="date" name="inDueDate" [ngModel]="invoice.invoiceDueDate | date:'yyyy-MM-dd'"
-                           (ngModelChange)="invoiceDueDateChange($event)">
+                           (ngModelChange)="invoiceDueDateChange($event)" [disabled]="invoiceReadonly">
                     auf das unten angegebene Konto.</p>
                 <p> Als Verwendungszweck geben Sie bitte
-                    <input type="text" class="inputLarge" name="intendedUse" [(ngModel)]="invoice.invoiceIntendedUse">
+                    <input type="text" class="inputLarge" name="intendedUse" [(ngModel)]="invoice.invoiceIntendedUse"
+                           [disabled]="invoiceReadonly">
                     an.</p>
             </div>
             <div *ngIf="invoice.invoiceKind.isSEPA">
@@ -221,12 +227,14 @@
                     Basislastschrift
                     zum Mandat
                     <input type="text" name="mandateIdentification" size="27"
-                           [(ngModel)]="invoice.customer.mandateIdentification">
+                           [(ngModel)]="invoice.customer.mandateIdentification" [disabled]="invoiceReadonly">
                     zu der Gläubigeridentifikationsnummer {{setting.creditorIdentificationNumber}}
                     von Ihrem Konto IBAN
-                    <input type="text" name="customerIBAN" size="27" [(ngModel)]="invoice.customer.customerIBAN">
+                    <input type="text" name="customerIBAN" size="27" [(ngModel)]="invoice.customer.customerIBAN"
+                           [disabled]="invoiceReadonly">
                     bei der Bank BIC
-                    <input type="text" name="customerBIC" size="27" [(ngModel)]="invoice.customer.customerBIC">
+                    <input type="text" name="customerBIC" size="27" [(ngModel)]="invoice.customer.customerBIC"
+                           [disabled]="invoiceReadonly">
                     zum Fälligkeitsdatum {{invoice.invoiceDueDate | date:'yyyy-MM-dd'}} ein. Wir bitten Sie,
                     für Kontodeckung zu sorgen.</p>
             </div>

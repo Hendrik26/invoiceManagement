@@ -202,6 +202,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
                     this.backToInvoiceList();
                     this.settingsService.timeoutAlert = this.timeoutAlertText;
                 }
+                this.timeoutCounter -= 10;
             });
     }
 
