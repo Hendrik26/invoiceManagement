@@ -15,7 +15,12 @@ export class SettingsDetailComponent implements OnInit, OnDestroy {
     public enableSaveButton = true;
     public settingList: object;
     public settingId: undefined;
-    private dataSubscription: Subscription;
+
+    private dataSubscription1: Subscription;
+    private dataSubscription2: Subscription;
+    private downloadSubscription: Subscription;
+    private writeSubscription: Subscription;
+    private uploadSubscription: Subscription;
 
     constructor(
         private router: Router,
@@ -26,8 +31,20 @@ export class SettingsDetailComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.dataSubscription) {
-            this.dataSubscription.unsubscribe();
+        if (this.dataSubscription1) {
+            this.dataSubscription1.unsubscribe();
+        }
+        if (this.dataSubscription2) {
+            this.dataSubscription2.unsubscribe();
+        }
+        if (this.writeSubscription) {
+            this.writeSubscription.unsubscribe();
+        }
+        if (this.uploadSubscription) {
+            this.uploadSubscription.unsubscribe();
+        }
+        if (this.downloadSubscription) {
+            this.downloadSubscription.unsubscribe();
         }
     }
 
@@ -40,58 +57,59 @@ export class SettingsDetailComponent implements OnInit, OnDestroy {
     }
 
     getSettingList(): void {
-        this.dataSubscription = this.fbInvoiceService.getSettingList().subscribe(
+        this.dataSubscription1 = this.fbInvoiceService.getSettingList().subscribe(
             r => {
                 this.settingList = r;
-            }
-        );
+            }, () => {
+                this.settingsService.handleDbError('Speicherfehler', 'Error during read the settings');
+            });
     }
 
     saveSetting(): void {
-        this.fbInvoiceService.saveSetting(this.settingsService.setting.exportSettingData()).subscribe(
+        this.writeSubscription = this.fbInvoiceService.saveSetting(this.settingsService.setting.exportSettingData()).subscribe(
             r => {
                 if (r) {
                     this.settingsService.settingId = r.id;
                 }
-            }
-            , () => {
+            }, () => {
                 this.settingsService.handleDbError('Datenbankfehler', 'Error during creation of a setting document');
-            }
-        );
+            });
         this.router.navigateByUrl('/login');
     }
 
     uploadLogo(event): void {
         this.enableSaveButton = false;
-        this.fbInvoiceService.uploadLogo(event).subscribe(
+        this.uploadSubscription = this.fbInvoiceService.uploadLogo(event).subscribe(
             r => {
                 if (r.state === 'success') {
                     this.settingsService.setting.logoId = r.metadata.name;
                     this.getDownloadUrl(this.settingsService.setting.logoId);
                     this.enableSaveButton = true;
                 }
-            }
-            , () => {
+            }, () => {
                 this.settingsService.handleDbError('Speicherfehler', 'Error during uploading a file');
-            }
-        );
+            });
     }
 
     private receiveSettingById(settingId: string): void {
         if (settingId) {
-            this.fbInvoiceService.getSettingById(settingId).subscribe(s => {
+            this.dataSubscription2 = this.fbInvoiceService.getSettingById(settingId).subscribe(s => {
                 if (s) {
                     this.settingsService.setting = Setting.normalizeSetting(s);
                     this.settingsService.settingId = settingId;
                 }
+            }, () => {
+                this.settingsService.handleDbError('Speicherfehler', 'Error during read the settings');
             });
         } else {
-            this.fbInvoiceService.getLastSetting()
+            this.dataSubscription2 = this.fbInvoiceService.getLastSetting()
                 .subscribe(s => {
                     if (s) {
                         this.settingsService.setting = Setting.normalizeSetting(s[0]);
                         this.settingsService.settingId = s[0].key;
                     }
+                }, () => {
+                    this.settingsService.handleDbError('Speicherfehler', 'Error during read a setting');
                 });
         }
         this.getDownloadUrl(this.settingsService.setting.logoId);
@@ -104,13 +122,12 @@ export class SettingsDetailComponent implements OnInit, OnDestroy {
         if (id.length === 0) {
             return;
         }
-        this.fbInvoiceService.getDownloadUrl(id).subscribe(
+        this.downloadSubscription = this.fbInvoiceService.getDownloadUrl(id).subscribe(
             r => {
                 this.settingsService.logoUrl = r;
             }, () => {
                 this.settingsService.handleDbError('Speicherfehler', 'Error during downloading a file');
-            }
-        );
+            });
     }
 
 }

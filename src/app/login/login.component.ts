@@ -38,6 +38,8 @@ export class LoginComponent implements OnInit {
                 this.settingsService.readonly = true;
             }
             this.getLastSetting();
+        }, () => {
+            this.settingsService.handleDbError('Speicherfehler', 'Error during login');
         });
         this.settingsService.email = '';
         this.settingsService.password = '';
@@ -61,6 +63,8 @@ export class LoginComponent implements OnInit {
                     this.settingsService.setting = Setting.normalizeSetting(s[0]);
                     this.settingsService.settingId = s[0].key;
                 }
+            }, () => {
+                this.settingsService.handleDbError('Speicherfehler', 'Error during read the settings');
             });
     }
 

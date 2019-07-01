@@ -61,6 +61,8 @@ export class CustomerListComponent implements OnInit, OnDestroy  {
         this.dataSubscription = this.fbInvoiceService.getCustomersList(this.showArchive)
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
+            }, () => {
+                this.settingsService.handleDbError('Speicherfehler', 'Error during read the customer list');
             });
     }
 
