@@ -6,7 +6,7 @@
 <hr>
 <div *ngIf="!settingsService.loginUser.id">
     <h2>Bitte melden Sie sich an</h2>
-
+    <h4 style="color: red" *ngIf="loginFailed">Fehlerhafte Anmeldung</h4>
     <input type="text" [(ngModel)]="settingsService.email" placeholder="email" name="email">&nbsp;&nbsp;
     <input type="password" [(ngModel)]="settingsService.password" placeholder="password" name="password">&nbsp;&nbsp;
     <button (click)="signin(0)" [disabled]="!settingsService.email || !settingsService.password">
