@@ -197,12 +197,11 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
                 const countMin = Math.floor(this.timeoutCounter / 60);
                 this.strTimeoutCounter = !this.invoiceReadonly && this.invoiceId
                     ? countMin.toString() + ':' + countSec.toString().slice(1, 3) : '';
-                if (this.timeoutCounter === 0 && !this.invoiceReadonly && this.invoiceId) {
+                if (this.timeoutCounter <= 0 && !this.invoiceReadonly && this.invoiceId) {
                     this.timeoutSubscription.unsubscribe();
                     this.backToInvoiceList();
                     this.settingsService.timeoutAlert = this.timeoutAlertText;
                 }
-                this.timeoutCounter -= 10;
             });
     }
 
