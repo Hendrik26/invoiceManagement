@@ -15,7 +15,6 @@ export class SettingsDetailComponent implements OnInit, OnDestroy {
     public enableSaveButton = true;
     public settingList: object;
     public settingId: undefined;
-
     private dataSubscription1: Subscription;
     private dataSubscription2: Subscription;
     private downloadSubscription: Subscription;

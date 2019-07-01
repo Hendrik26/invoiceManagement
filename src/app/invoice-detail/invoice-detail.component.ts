@@ -137,6 +137,9 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
     }
 
     public receiveCustomers(): void {
+        if (this.settingsService.readonly) {
+            return;
+        }
         this.customerSubscription = this.dataSubscription = this.fbInvoiceService.getCustomersList('notArchive')
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
@@ -276,8 +279,6 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
                     this.historyTest = invoiceTest[1];
                 });
             }
-        }, () => {
-            this.settingsService.handleDbError('Datenbankfehler', 'Error during read a invoice');
         });
     }
 

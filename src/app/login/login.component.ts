@@ -1,7 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {FbInvoiceService} from '../fb-invoice.service';
 import {SettingsService} from '../settings.service';
 import {Setting} from '../setting';
+import {Subscription} from 'rxjs';
 
 // import {LoginUser} from '../loginuser';
 
@@ -10,7 +11,10 @@ import {Setting} from '../setting';
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
+
+    private signinSubscription: Subscription;
+    private settingsSubscription: Subscription;
 
     constructor(
         public fbInvoiceService: FbInvoiceService,
@@ -18,12 +22,20 @@ export class LoginComponent implements OnInit {
     ) {
     }
 
+    ngOnDestroy(): void {
+        this.unsubscribe();
+    }
+
     ngOnInit() {
         this.settingsService.timeoutAlert = null;
+        if (this.settingsService.loginUser.id) {
+            this.getLastSetting();
+        }
     }
 
     private signin(type: number) {
-        this.fbInvoiceService.signin$(type, this.settingsService.email, this.settingsService.password).subscribe(value => {
+        this.signinSubscription = this.fbInvoiceService.signin$(type, this.settingsService.email, this.settingsService.password)
+            .subscribe(value => {
             this.settingsService.loginUser.id = value[0].user.uid; // value[0]: data comes from Firebase-authentication
             this.settingsService.loginUser.email = value[0].user.email;
             this.settingsService.loginUser.providerId = value[0].additionalUserInfo.providerId;
@@ -46,6 +58,7 @@ export class LoginComponent implements OnInit {
     }
 
     private logout() {
+        this.unsubscribe();
         this.settingsService.loginUser.id = null;
         this.settingsService.loginUser.email = null;
         this.fbInvoiceService.logout();
@@ -57,7 +70,10 @@ export class LoginComponent implements OnInit {
     }
 
     private getLastSetting(): void {
-        this.fbInvoiceService.getLastSetting()
+        if (this.settingsSubscription) {
+            this.settingsSubscription.unsubscribe();
+        }
+        this.settingsSubscription = this.fbInvoiceService.getLastSetting()
             .subscribe(s => {
                 if (s) {
                     this.settingsService.setting = Setting.normalizeSetting(s[0]);
@@ -66,6 +82,15 @@ export class LoginComponent implements OnInit {
             }, () => {
                 this.settingsService.handleDbError('Speicherfehler', 'Error during read the settings');
             });
+    }
+
+    private unsubscribe(): void {
+        if (this.signinSubscription) {
+            this.signinSubscription.unsubscribe();
+        }
+        if (this.settingsSubscription) {
+            this.settingsSubscription.unsubscribe();
+        }
     }
 
 }

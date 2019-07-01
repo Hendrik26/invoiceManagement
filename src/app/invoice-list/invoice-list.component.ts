@@ -161,6 +161,9 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
     }
 
     private receiveCustomers(): void {
+        if (this.settingsService.readonly) {
+            return;
+        }
         this.customerSubscription = this.fbInvoiceService.getCustomersList('notArchive')
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
