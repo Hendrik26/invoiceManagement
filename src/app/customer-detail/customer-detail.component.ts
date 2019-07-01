@@ -1,4 +1,4 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Customer} from '../customer';
 import {CustomerType} from '../customer-type';
@@ -24,9 +24,11 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
     historyTest: boolean;
     newCustomer: boolean;
     receivedCustomerIdError: boolean;
+    private createSubscription: Subscription;
     private dataSubscription: Subscription;
     private historySubscription1: Subscription;
     private historySubscription2: Subscription;
+    private updateSubscription: Subscription;
 
     constructor(
         private router: Router,
@@ -40,11 +42,17 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
         if (this.historySubscription1) {
             this.historySubscription1.unsubscribe();
         }
-      if (this.historySubscription2) {
-        this.historySubscription2.unsubscribe();
-      }
+        if (this.historySubscription2) {
+            this.historySubscription2.unsubscribe();
+        }
         if (this.dataSubscription) {
             this.dataSubscription.unsubscribe();
+        }
+        if (this.createSubscription) {
+            this.createSubscription.unsubscribe();
+        }
+        if (this.updateSubscription) {
+            this.updateSubscription.unsubscribe();
         }
     }
 
@@ -95,6 +103,8 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
         this.historySubscription1 = this.fbInvoiceService.getCustomerHistoryById(id)
             .subscribe(data => {
                 this.historyDateList = data;
+            }, () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during read a customer history');
             });
     }
 
@@ -114,9 +124,13 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
         if (!this.newCustomer) {
             this.dataSubscription = this.fbInvoiceService.getCustomerById(id, historyId).subscribe(customerType => {
                 this.customer = new Customer(id, customerType);
+            }, () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during read a customer');
             });
-          this.historySubscription2 = this.fbInvoiceService.testCustomerHistoryById(id).subscribe(customerTest => {
+            this.historySubscription2 = this.fbInvoiceService.testCustomerHistoryById(id).subscribe(customerTest => {
                 this.historyTest = customerTest[1];
+            }, () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during read a customer history');
             });
         } else {
             this.customer = Customer.createNewCustomer();
@@ -124,7 +138,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
     }
 
     private createCustomer(customerType: CustomerType): void {
-        this.fbInvoiceService.createCustomer(customerType).subscribe(
+        this.createSubscription = this.fbInvoiceService.createCustomer(customerType).subscribe(
             () => {
             }
             , () => {
@@ -134,7 +148,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
     }
 
     private updateCustomer(id: string, customerType: CustomerType): void {
-        this.fbInvoiceService.updateCustomer(id, customerType).subscribe(
+        this.updateSubscription = this.fbInvoiceService.updateCustomer(id, customerType).subscribe(
             () => {
             }
             , () => {

@@ -1,6 +1,5 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Location} from '@angular/common';
 import {Invoice} from '../invoice';
 import {Item} from '../item';
 import {InvoiceKind} from '../invoice-kind';
@@ -46,12 +45,15 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
     private downloadSubscription: Subscription;
     private editNewItem: boolean;
     private historySubscription: Subscription;
+    private invoiceLocked = false;
     private items: Item[];
+    private lockSubscription: Subscription;
     private oldItem: Item;
     private receivedInvoiceIdError: boolean;
-    private timeoutSubscription: Subscription;
-    private invoiceLocked = false;
+    private saveSubscription: Subscription;
     private timeoutAlertText = 'Rechnungseditor wurde wegen Zeitüberschreitung geschlossen';
+    private timeoutSubscription: Subscription;
+    private unlockSubscription: Subscription;
 
     constructor(
         private router: Router,
@@ -81,6 +83,15 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
         }
         if (this.historySubscription) {
             this.historySubscription.unsubscribe();
+        }
+        if (this.saveSubscription) {
+            this.saveSubscription.unsubscribe();
+        }
+        if (this.lockSubscription) {
+            this.lockSubscription.unsubscribe();
+        }
+        if (this.unlockSubscription) {
+            this.unlockSubscription.unsubscribe();
         }
     }
 
@@ -126,9 +137,11 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
     }
 
     public receiveCustomers(): void {
-        this.customerSubscription =  this.dataSubscription = this.fbInvoiceService.getCustomersList('notArchive')
+        this.customerSubscription = this.dataSubscription = this.fbInvoiceService.getCustomersList('notArchive')
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
+            }, () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during read the customer list');
             });
     }
 
@@ -263,6 +276,8 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
                     this.historyTest = invoiceTest[1];
                 });
             }
+        }, () => {
+            this.settingsService.handleDbError('Datenbankfehler', 'Error during read a invoice');
         });
     }
 
@@ -271,7 +286,8 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
             return;
         }
         this.timeoutCounter = this.settingsService.setting.timeoutForEdit;
-        this.fbInvoiceService.lockInvoice(this.invoiceId, this.settingsService.loginUser.email, new Date()).subscribe(
+        this.lockSubscription = this.fbInvoiceService
+            .lockInvoice(this.invoiceId, this.settingsService.loginUser.email, new Date()).subscribe(
             () => {
             }
             , () => {
@@ -285,7 +301,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
         if (!this.invoiceId || this.invoiceReadonly || this.settingsService.readonly) {
             return;
         }
-        this.fbInvoiceService.lockInvoice(this.invoiceId, null, null).subscribe(
+        this.unlockSubscription = this.fbInvoiceService.lockInvoice(this.invoiceId, null, null).subscribe(
             () => {
             }
             , () => {
@@ -301,7 +317,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
         if (id.length === 0) {
             return;
         }
-        this.downloadSubscription =  this.fbInvoiceService.getDownloadUrl(id).subscribe(
+        this.downloadSubscription = this.fbInvoiceService.getDownloadUrl(id).subscribe(
             r => {
                 this.logoUrl = r;
             }
@@ -314,7 +330,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
     private saveInvoice(archive: boolean = false): void {
         console.log('invoice-detail.component.ts: method saveInvoice');
         this.calculateSums();
-        this.fbInvoiceService.updateInvoice(this.invoiceId, this.invoice.exportInvoiceToAny(archive)).subscribe(
+        this.saveSubscription = this.fbInvoiceService.updateInvoice(this.invoiceId, this.invoice.exportInvoiceToAny(archive)).subscribe(
             () => {
             }
             , () => {
@@ -322,7 +338,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
             }
         );
         this.router.navigateByUrl('/invoice-list');
-        this.lockInvoice();
+        // this.lockInvoice();
     }
 
     private calculateAddress(): void {
@@ -356,7 +372,7 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
 
     private calculateReadonly(): boolean {
         if (this.route.snapshot.paramMap.has('invoiceReadonly')) {
-           return this.route.snapshot.paramMap.get('invoiceReadonly') === 'true' || this.settingsService.readonly;
+            return this.route.snapshot.paramMap.get('invoiceReadonly') === 'true' || this.settingsService.readonly;
         } else {
             return this.settingsService.readonly;
         }

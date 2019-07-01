@@ -155,6 +155,8 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
                 // console.log('INVOICES: ', invoices);
                 this.invoices = invoices.map(invoice => Invoice.normalizeInvoice(invoice));
                 this.sortInvoice();
+            }, () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during read the invoice list');
             });
     }
 
@@ -162,6 +164,8 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
         this.customerSubscription = this.fbInvoiceService.getCustomersList('notArchive')
             .subscribe(data => {
                 this.customers = Customer.sortCustomers(data.map(x => Customer.normalizeCustomer(x)));
+            }, () => {
+                this.settingsService.handleDbError('Datenbankfehler', 'Error during read the customer list');
             });
     }
 
