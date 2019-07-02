@@ -36,6 +36,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     private signin(type: number) {
         this.loginFailed = false;
+        this.settingsService.passReset1 = false;
         this.signinSubscription = this.fbInvoiceService.signin$(type, this.settingsService.email, this.settingsService.password)
             .subscribe(value => {
                 this.settingsService.loginUser.id = value[0].user.uid; // value[0]: data comes from Firebase-authentication
@@ -63,6 +64,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.unsubscribe();
         this.settingsService.loginUser.id = null;
         this.settingsService.loginUser.email = null;
+        this.settingsService.passReset1 = false;
         this.fbInvoiceService.logout();
     }
 
