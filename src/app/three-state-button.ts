@@ -11,8 +11,8 @@ export class ThreeStateButton {
     }
 
 
-    //region getter
-    public getSortBy(){
+    // region getter
+    public getSortBy() {
         return this.sortBy;
     }
 

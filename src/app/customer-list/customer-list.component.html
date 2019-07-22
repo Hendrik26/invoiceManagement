@@ -28,7 +28,7 @@
                 <th>Adresse 2</th>
                 <th>Adresse 3</th>
                 <th>Umsatzsteuernummer</th>
-                <th>erstellt am</th>
+                <!-- <th>erstellt am</th> -->
                 <th>letztes update am</th>
                 <!-- th>Archiviert???</th -->
                 <th>Ändern</th>
@@ -45,7 +45,7 @@
                 <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.addressLine2}}</td>
                 <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.addressLine3}}</td>
                 <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.customerSalesTaxNumber}}</td>
-                <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.creationTime | date:'yyyy-MM-dd'}}</td>
+                <!-- <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.creationTime | date:'yyyy-MM-dd'}}</td> -->
                 <td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.lastUpdateTime | date:'yyyy-MM-dd'}}</td>
                 <!-- td [ngStyle]="{'color':customer.archived ? 'red' : 'black' }">{{customer.archived}}</td -->
                 <td>
