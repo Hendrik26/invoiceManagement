@@ -122,11 +122,17 @@ export class CustomerDetailComponent implements OnInit, OnDestroy {
 
     private receiveFbCustomerById(id: string, historyId: string): void {
         if (!this.newCustomer) {
+            if (this.dataSubscription) {
+                this.dataSubscription.unsubscribe();
+            }
             this.dataSubscription = this.fbInvoiceService.getCustomerById(id, historyId).subscribe(customerType => {
                 this.customer = new Customer(id, customerType);
             }, () => {
                 this.settingsService.handleDbError('Datenbankfehler', 'Error during read a customer');
             });
+            if (this.historySubscription2) {
+                this.historySubscription2.unsubscribe();
+            }
             this.historySubscription2 = this.fbInvoiceService.testCustomerHistoryById(id).subscribe(customerTest => {
                 this.historyTest = customerTest[1];
             }, () => {

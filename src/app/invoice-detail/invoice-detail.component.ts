@@ -281,6 +281,9 @@ export class InvoiceDetailComponent implements OnInit, OnDestroy {
     }
 
     private receiveInvoiceById(id: string, historyId: string): void {
+        if (this.dataSubscription) {
+            this.dataSubscription.unsubscribe();
+        }
         this.dataSubscription = this.fbInvoiceService.getInvoiceById(id, historyId, this.settingsService.settingId).subscribe(c => {
             if (!this.invoiceLocked) {
                 this.invoice = Invoice.normalizeInvoice(c[0]);

@@ -84,8 +84,8 @@ export class LoginComponent implements OnInit, OnDestroy {
                     this.settingsService.settingId = s[0].key;
                 }
             }, () => {
-                console.log('temp Error during read the settings');
-                // this.settingsService.handleDbError('Speicherfehler', 'Error during read the settings');
+                // console.log('temp Error during read the settings');
+                this.settingsService.handleDbError('Speicherfehler', 'Error during read the settings');
             });
     }
 
